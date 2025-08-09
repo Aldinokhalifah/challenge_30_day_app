@@ -1,0 +1,46 @@
+import { connectToDatabase } from "@/app/lib/mongoose";
+import User from "../../../../../models/User";
+import { NextResponse } from "next/server";
+
+export async function POST(req) {
+    await connectToDatabase();
+
+    try {
+        const body = await req.json();
+        const { name, email, password } = body;
+        
+        const existingUser = await User.findOne({email});
+        if(existingUser) {
+            return NextResponse.json(
+                { message: 'Akun sudah terdaftar!'},
+                {status: 400}
+            );
+        }
+
+        const lastUser = await User.findOne().sort({customId: -1});
+        const customId = lastUser ? lastUser.customId + 1 : 1;
+
+        const newUser = new User({
+            customId,
+            name,
+            email,
+            password
+        })
+
+        await newUser.save();
+
+        return NextResponse.json({ 
+            message: "Registrasi berhasil", 
+            data: {
+                id: newUser.customId,
+                name: newUser.name,
+                email: newUser.email
+            }
+        }, { status: 201 });
+    } catch (error) {
+        return NextResponse.json({
+            message: 'Registrasi gagal',
+            error: error.message
+        }, { status: 500 });
+    }
+}
