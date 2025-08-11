@@ -20,6 +20,23 @@ export async function POST(req) {
         const lastUser = await User.findOne().sort({customId: -1});
         const customId = lastUser ? lastUser.customId + 1 : 1;
 
+         // Validasi input
+        if (!name || !email || !password) {
+            return NextResponse.json(
+                { message: 'Semua field harus diisi' },
+                { status: 400 }
+            );
+        }
+
+        // Validasi email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return NextResponse.json(
+                { message: 'Format email tidak valid' },
+                { status: 400 }
+            );
+        }
+
         const newUser = new User({
             customId,
             name,

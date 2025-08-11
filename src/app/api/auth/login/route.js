@@ -14,17 +14,18 @@ export async function POST(req) {
 
         const findUser = await User.findOne({email});
         if(!findUser) {
-            return NextResponse.json({
-                message: 'User tidak ditemukan' }), 
-                {status: 404}
-            ;
+            return NextResponse.json(
+                { message: 'User tidak ditemukan' },
+                { status: 404 }
+            );
         }
 
-        const isMatch = await findUser.matchPassword(password); // method dari instance
+        const isMatch = await findUser.matchPassword(password);
         if (!isMatch) {
             return NextResponse.json(
-                { message: 'Password salah' }), 
-                { status: 401 };
+                { message: 'Password salah' },
+                { status: 401 }
+            );
         }
 
         const token = jwt.sign({ id: findUser._id}, JWT_SECRET, { expiresIn: '1d'});
@@ -39,9 +40,13 @@ export async function POST(req) {
             }
         }, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ 
-            message: 'Gagal login',
-            error: error.message
-        }), { status: 500 };
+        console.error('Login error:', error);
+        return NextResponse.json(
+            { 
+                message: 'Gagal login',
+                error: error.message
+            },
+            { status: 500 }
+        );
     }
 }
