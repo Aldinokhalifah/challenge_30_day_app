@@ -69,7 +69,7 @@ export default function Register() {
                 confirmButtonText: 'Login'
             });
 
-            router.push('/login');
+            router.push('/Login');
         } catch (error) {
             Swal.fire({
                 title: error.message || "Terjadi kesalahan pada server",
@@ -79,7 +79,8 @@ export default function Register() {
         } finally {
             setIsLoading(false);
         }
-        }
+    }
+
     return(
         <>
             <AnimatedGradientBg>
@@ -141,11 +142,20 @@ export default function Register() {
                                 </div>
                                 <div className="mt-5">
                                     <button
-                                    className="py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-                                    type="submit"
-                                    disabled={isLoading}
+                                        className={`py-2 px-4 w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md rounded-lg
+                                            ${isLoading 
+                                                ? 'bg-gray-400 cursor-not-allowed' 
+                                                : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-800 text-white'
+                                            }`}
+                                        type="submit"
+                                        disabled={isLoading}
                                     >
-                                    {isLoading ? 'Loading...' : 'Sign Up'}
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center">
+                                                <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                                                Loading...
+                                            </div>
+                                        ) : "Sign Up"}
                                     </button>
                                 </div>
                             </form>

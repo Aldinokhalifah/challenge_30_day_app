@@ -10,6 +10,7 @@ export default function Login() {
     const [form, setForm] = useState({email: '', password: ''});
     const [message, setMessage] = useState('');
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,6 +43,8 @@ export default function Login() {
                 icon: 'error',
                 confirmButtonText: 'OK'
             });
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -91,10 +94,20 @@ export default function Login() {
                                 </div>
                                 <div className="mt-5">
                                     <button
-                                    className="py-2 px-4 bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
-                                    type="submit"
+                                        className={`py-2 px-4 w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md rounded-lg
+                                            ${isLoading 
+                                                ? 'bg-gray-400 cursor-not-allowed' 
+                                                : 'bg-blue-600 hover:bg-blue-700 focus:bg-blue-800 text-white'
+                                            }`}
+                                        type="submit"
+                                        disabled={isLoading}
                                     >
-                                    Sign In
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center">
+                                                <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                                                Loading...
+                                            </div>
+                                        ) : "Sign In"}
                                     </button>
                                 </div>
                             </form>
