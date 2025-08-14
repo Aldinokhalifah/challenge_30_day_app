@@ -9,40 +9,47 @@ export default function ProtectedRoute({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Cek token dan inaktivitas saat komponen mount
         const token = localStorage.getItem("token");
-        if (!token) {
-        router.replace("/Login");
-        } else {
-        setLoading(false);
+        if (!token || checkInactivity()) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("lastActivity");
+            router.replace("/Login");
+            return;
         }
+        setLoading(false);
     }, [router]);
 
+    // Update lastActivity saat ada aktivitas
     useEffect(() => {
         const handleActivity = () => {
-        localStorage.setItem("lastActivity", Date.now());
-    };
+            localStorage.setItem("lastActivity", Date.now().toString());
+        };
 
-    window.addEventListener("mousemove", handleActivity);
-    window.addEventListener("keydown", handleActivity);
+        handleActivity(); // Set initial activity
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
 
-    return () => {
-        window.removeEventListener("mousemove", handleActivity);
-        window.removeEventListener("keydown", handleActivity);
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
         };
     }, []);
 
+    // Cek inaktivitas setiap menit
     useEffect(() => {
         const interval = setInterval(() => {
-        if (checkInactivity()) {
-            localStorage.removeItem("token");
-            router.replace("/Login");
-        }
-        }, 60000);
+            if (checkInactivity()) {
+                router.replace("/Login");
+            }
+        }, 60000); // Check every minute
 
         return () => clearInterval(interval);
     }, [router]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return <>{children}</>;
 }

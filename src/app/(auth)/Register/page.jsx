@@ -90,7 +90,7 @@ export default function Register() {
                     >
                         <div className="max-w-md mx-auto">
                             <div className="flex items-center space-x-5 justify-center text-2xl font-bold text-white">
-                                <div className="bg-clip-text text-transparent text-center bg-gradient-to-r from-cyan-400 to-blue-600 mr-1"> Sign Up</div> Your Account
+                                <div className="bg-clip-text text-transparent text-center bg-gradient-to-r from-cyan-400 to-blue-600 mr-2"> Sign Up</div> to Your Account
                             </div>
                             <form action="#" method="POST" onSubmit={handleSubmit}>
                                 <div className="mt-5">

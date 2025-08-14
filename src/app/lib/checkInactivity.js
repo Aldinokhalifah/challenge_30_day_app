@@ -1,12 +1,14 @@
-export function checkInactivity(maxInactivity = 30 * 60 * 1000) { // default: 30 menit
+export function checkInactivity(maxInactivity = 30 * 60 * 1000) {
     const lastActivity = localStorage.getItem("lastActivity");
     const now = Date.now();
 
     if (!lastActivity) {
-        return true; 
+        localStorage.removeItem("token"); 
+        return true;
     }
 
-    if(lastActivity && now - lastActivity > maxInactivity) {
+    const inactiveTime = now - parseInt(lastActivity); // Pastikan konversi ke number
+    if(inactiveTime > maxInactivity) {
         localStorage.removeItem("token");
         localStorage.removeItem("lastActivity");
         return true;

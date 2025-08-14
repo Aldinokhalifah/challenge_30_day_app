@@ -7,16 +7,16 @@ const AnimatedGradientBg = ({ children, className = "" }) => {
 
     // Array of beautiful gradient combinations
     const gradients = [
-        'bg-gradient-to-br from-purple-400 via-pink-500 to-red-500',
-        'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500', 
-        'bg-gradient-to-br from-green-400 via-blue-500 to-purple-600',
-        'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500',
-        'bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-500',
-        'bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500',
-        'bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-500',
-        'bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500',
-        'bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600',
-        'bg-gradient-to-br from-teal-400 via-green-500 to-blue-500'
+        'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-950',
+        'bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900',
+        'bg-gradient-to-br from-slate-950 via-indigo-900 to-purple-950',
+        'bg-gradient-to-br from-zinc-900 via-slate-800 to-gray-950',
+        'bg-gradient-to-br from-neutral-900 via-stone-800 to-zinc-950',
+        'bg-gradient-to-br from-stone-950 via-neutral-900 to-slate-900',
+        'bg-gradient-to-br from-purple-950 via-slate-900 to-gray-950',
+        'bg-gradient-to-br from-blue-950 via-indigo-900 to-violet-950',
+        'bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950',
+        'bg-gradient-to-br from-violet-950 via-indigo-900 to-blue-950'
     ];
 
     useEffect(() => {
@@ -29,27 +29,27 @@ const AnimatedGradientBg = ({ children, className = "" }) => {
 
     return (
         <div className={`min-h-screen relative overflow-hidden ${className}`}>
-            {/* Main gradient background with CSS animations */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-                {/* Animated gradient overlays */}
-                <div className="absolute inset-0 opacity-50">
-                    <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-700 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-                    <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-700 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-                    <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-700 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+            {/* Updated main gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950">
+                {/* Updated animated gradient overlays with darker colors */}
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-950 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+                    <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-950 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+                    <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-950 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
                 </div>
             </div>
 
-            {/* Grid pattern overlay */}
-            <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
+            {/* Updated grid pattern overlay with lower opacity */}
+            <div className="absolute inset-0 bg-grid-white/[0.01] bg-[size:50px_50px]" />
             
-            {/* Radial gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent" />
+            {/* Updated radial gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-950/10 to-transparent" />
             
-            {/* Moving dots pattern */}
+            {/* Updated moving dots pattern with lower opacity */}
             <div className="absolute inset-0">
-                <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-ping" />
-                <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-purple-400/30 rounded-full animate-pulse" />
-                <div className="absolute bottom-1/4 left-2/3 w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-bounce" />
+                <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/10 rounded-full animate-ping" />
+                <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-purple-400/20 rounded-full animate-pulse" />
+                <div className="absolute bottom-1/4 left-2/3 w-1.5 h-1.5 bg-blue-400/20 rounded-full animate-bounce" />
             </div>
 
             {/* Content */}

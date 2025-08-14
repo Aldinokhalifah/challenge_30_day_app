@@ -13,6 +13,7 @@
     "dotenv": "^17.2.1",
     "gitignore": "^0.7.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.539.0",
     "mongoose": "^8.17.0",
     "next": "15.4.5",
     "react": "19.1.0",
