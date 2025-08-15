@@ -17,37 +17,43 @@ export default function Login() {
     };
     
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage('');
+    e.preventDefault();
+    
+    try {
+        setIsLoading(true); // Tambahkan di awal
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache' // Tambahkan ini
+            },
+            body: JSON.stringify(form)
+        });
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form)
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Login failed');
-            }
-
-            localStorage.setItem("token", data.token);
-            localStorage.setItem('userData', JSON.stringify(data.userData));
-            localStorage.setItem("lastActivity", Date.now());
-
-            router.push('/'); // Redirect setelah login
-        } catch (error) {
-            Swal.fire({
-                title: error.message || "Terjadi kesalahan pada server",
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        } finally {
-            setIsLoading(false);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Login failed');
         }
+        
+        // Simpan data secara bersamaan
+        Promise.all([
+            localStorage.setItem("token", data.token),
+            localStorage.setItem('userData', JSON.stringify(data.userData)),
+            localStorage.setItem("lastActivity", Date.now().toString())
+        ]);
+        
+        router.push('/');
+    } catch (error) {
+        Swal.fire({
+            title: error.message || "Terjadi kesalahan pada server",
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    } finally {
+        setIsLoading(false);
     }
+}
 
     return(
         <>
