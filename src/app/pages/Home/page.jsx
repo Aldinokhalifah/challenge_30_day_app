@@ -5,6 +5,7 @@ import Sidebar from "@/app/components/sidebar";
 import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
 import AnimatedGradientBg from "@/app/components/animatedBgGradient";
+import Hero from "@/app/components/Home/Hero";
 
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,12 +39,8 @@ export default function HomePage() {
                             </header>
 
                             {/* Content */}
-                            <main className="flex-1 p-4">
-                            <h2 className="text-2xl font-bold">Dashboard</h2>
-                            <p className="mt-4 text-slate-300">
-                                Selamat datang {userData?.name}  di Habit Tracker!  
-                                Ini halaman dashboard utama.
-                            </p>
+                            <main className="flex-1 p-4 overflow-y-scroll">
+                            <Hero name={userData?.name} />
                             </main>
                         </div>
                     </div>

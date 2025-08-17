@@ -50,7 +50,6 @@ export default function Register() {
         }
 
         try {
-            setIsLoading(true);
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -62,14 +61,15 @@ export default function Register() {
             if (!response.ok) {
                 throw new Error(data.message || 'Registration failed');
             }
-
+            
             await Swal.fire({
                 title: 'Success',
                 text: 'Akun telah berhasil dibuat',
                 icon: 'success',
                 confirmButtonText: 'Login'
             });
-
+            
+            setIsLoading(true);
             router.push('/Login');
         } catch (error) {
             Swal.fire({
@@ -112,7 +112,7 @@ export default function Register() {
                                     />
                                     <label
                                     className="font-semibold text-sm text-white pb-1 block"
-                                    for="e-mail"
+                                    for="email"
                                     >E-mail</label
                                     >
                                     <input
@@ -120,7 +120,7 @@ export default function Register() {
                                     className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full text-white"
                                     type="email"
                                     id="email"
-                                    name="email" // Tambahkan ini
+                                    name="email"
                                     value={form.email} 
                                     required
                                     onChange={handleChange}
@@ -135,7 +135,7 @@ export default function Register() {
                                     className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full text-white"
                                     type="password"
                                     id="password"
-                                    name="password" // Tambahkan ini
+                                    name="password"
                                     value={form.password}
                                     required
                                     onChange={handleChange}
