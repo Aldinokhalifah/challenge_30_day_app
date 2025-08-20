@@ -6,18 +6,54 @@ import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
 import AnimatedGradientBg from "@/app/components/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
+import { ActiveChallengesSection } from "@/app/components/Home/ActiveChallengeSection";
 
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ userData, setUserData] = useState(null);
+    const [challengeStats, setChallengeStats] = useState([]);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const userData = localStorage.getItem('userData');
+        const token = localStorage.getItem('token');
 
         if (userData) {
-            setUserData(JSON.parse(userData));
+            try {
+                setUserData(JSON.parse(userData));
+            } catch (error) {
+                console.error('Error parsing userData:', error);
+            }
         }
-    }, [])
+
+        const fetchChallengeStats = async () => {
+            if (!token) {
+                console.error('Token not found');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/challenge/read', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setChallengeStats(data.challenges);
+            } catch (error) {
+                console.error('Error fetching challenge stats:', error);
+                setError(error.message);
+            }
+        };
+
+        fetchChallengeStats();
+    }, []);
     return (
         <ProtectedRoute>
                 <AnimatedGradientBg>
@@ -39,8 +75,12 @@ export default function HomePage() {
                             </header>
 
                             {/* Content */}
-                            <main className="flex-1 p-4 overflow-y-scroll">
+                            <main className="flex-1 p-4 ">
                             <Hero name={userData?.name} />
+
+                            <div className="flex flex-col justify-center items-center gap-4 mt-20">
+                                <ActiveChallengesSection challengeStats={challengeStats}/>
+                            </div>
                             </main>
                         </div>
                     </div>

@@ -22,7 +22,7 @@ export async function GET(req) {
 
         return {
             id: challenge._id,
-            cutomId: challenge.customId,
+            customId: challenge.customId,
             title: challenge.title,
             description: challenge.description,
             startDate: challenge.startDate,

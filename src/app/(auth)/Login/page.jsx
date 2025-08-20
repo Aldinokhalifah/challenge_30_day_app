@@ -18,9 +18,9 @@ export default function Login() {
     
     const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Tambahkan di awal
     
     try {
+        setIsLoading(true); // Tambahkan di awal
         const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 

@@ -82,12 +82,6 @@ export default function Sidebar({ isOpen, onClose }) {
               <p className="text-lg font-semibold">Days App</p>
             </div>
           </div>
-          <Link
-            href="/challenges/create"
-            className="mt-6 block w-full rounded-2xl bg-white/5 hover:bg-white/10 ring-1 ring-white/10 px-4 py-3 text-sm font-medium transition"
-          >
-            + Create Challenge
-          </Link>
         </div>
 
         {/* nav list */}

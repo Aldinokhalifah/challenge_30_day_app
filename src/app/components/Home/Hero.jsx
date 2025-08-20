@@ -92,31 +92,33 @@ export default function Hero({name}) {
                         </div>
 
                         {/* Main Heading */}
-                        <div className="space-y-4">
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+                        <div className="space-y-4 flex flex-col items-center lg:items-start">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight flex gap-2 items-center">
                                 <span className="block text-white/80">Hello</span>
-                                <span className="block bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+                                <span className="block bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent capitalize">
                                     {name}
                                 </span>
                             </h1>
                             
                             <div className="flex items-center gap-4 text-xl text-white/70">
-                                <div className="w-12 h-px bg-gradient-to-r from-transparent to-indigo-400"></div>
-                                <span>Ready for the challenge?</span>
+                                <div className="w-12 h-px bg-gradient-to-r from-transparent  to-indigo-400"></div>
+                                <span className='text-pretty text-center'>Ready for the challenge?</span>
                                 <div className="w-12 h-px bg-gradient-to-l from-transparent to-indigo-400"></div>
                             </div>
                         </div>
 
                         {/* Typed Text Container */}
-                        <div className="relative p-6 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10">
+                        <div className="container relative p-6 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10">
                             <div className="absolute top-4 left-4 flex gap-2">
                                 <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                                 <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                                 <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                             </div>
-                            <div className="mt-6 min-h-[60px] flex items-center">
-                                <span className="text-cyan-400 mr-2">$</span>
-                                <h2 className='auto-typed text-white text-lg sm:text-xl font-mono'></h2>
+                            <div className="mt-6 min-h-[80px] sm:min-h-[100px] flex items-start pt-2">
+                                <span className="text-cyan-400 mr-2 flex-shrink-0 text-xl ">$</span>
+                                <div className="flex-1 overflow-hidden">
+                                    <h2 className='auto-typed text-white text-base sm:text-lg lg:text-xl font-mono leading-relaxed break-words whitespace-normal'></h2>
+                                </div>
                             </div>
                         </div>
 
@@ -149,7 +151,7 @@ export default function Hero({name}) {
                         </div>
 
                         {/* Stats Row */}
-                        <div className="flex gap-8 pt-6 border-t border-white/10">
+                        <div className="flex items-center lg:items-start gap-8 pt-6 border-t border-white/10">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">30</div>
                                 <div className="text-sm text-white/60">Days Challenge</div>

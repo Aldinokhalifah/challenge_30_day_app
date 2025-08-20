@@ -19,7 +19,7 @@ const AnimatedGradientBg = ({ children, className = "" }) => {
         'bg-gradient-to-br from-violet-950 via-indigo-900 to-blue-950'
     ];
 
-    useEffect(() => {
+    useEffect(() => {   
         const interval = setInterval(() => {
             setGradientIndex(prev => (prev + 1) % gradients.length);
         }, 3000); // Change every 3 seconds
