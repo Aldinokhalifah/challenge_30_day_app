@@ -138,7 +138,7 @@ export default function Hero({name}) {
                             </Link>
                             
                             <Link
-                                href="/challenges"
+                                href="/pages/Challenges"
                                 className="group px-8 py-4 border-2 border-indigo-400/30 rounded-2xl font-semibold text-white/90 hover:border-indigo-400/60 hover:bg-indigo-500/10 transition-all duration-300 backdrop-blur-sm"
                             >
                                 <div className="flex items-center justify-center gap-3">
@@ -151,7 +151,7 @@ export default function Hero({name}) {
                         </div>
 
                         {/* Stats Row */}
-                        <div className="flex items-center lg:items-start gap-8 pt-6 border-t border-white/10">
+                        <div className="flex items-center justify-center lg:items-start gap-8 pt-6 border-t border-white/10">
                             <div className="text-center">
                                 <div className="text-2xl font-bold text-white">30</div>
                                 <div className="text-sm text-white/60">Days Challenge</div>
