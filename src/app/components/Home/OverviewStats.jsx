@@ -176,7 +176,7 @@ export default function OverviewStats() {
                                     <span>{item.label === 'Progress' ? 'Progress' : 'Overall'}</span>
                                     <span>
                                         {item.label === 'Progress' 
-                                            ? `${item.actualValue}%` 
+                                            ? `${item.value}` 
                                             : `+${item.value}%`
                                         }
                                     </span>
@@ -185,9 +185,9 @@ export default function OverviewStats() {
                                     <div 
                                         className={`bg-gradient-to-r ${item.gradient} h-1.5 rounded-full transition-all duration-1000 ease-out`}
                                         style={{ 
-                                            width: item.label === 'Progress' 
+                                            width: item.actualValue > 0 
                                                 ? `${Math.min(item.actualValue)}%`
-                                                : `${Math.min(item.actualValue)}%`
+                                                : `0%`
                                         }}
                                     ></div>
                                 </div>

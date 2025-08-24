@@ -4,25 +4,17 @@ import ProtectedRoute from "@/app/components/protectedRoute";
 import { useEffect, useState } from "react";
 import { Menu } from 'lucide-react';
 import Sidebar from "@/app/components/sidebar";
-import { ActiveChallengesSection } from "@/app/components/Home/ActiveChallengeSection";
+import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChallengeSection";
+import Loading from "@/app/components/loading";
 
 export default function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [ userData, setUserData] = useState(null);
     const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
+    const [loading, isLoading] = useState(false);
     
     useEffect(() => {
-            const userData = localStorage.getItem('userData');
             const token = localStorage.getItem('token');
-    
-            if (userData) {
-                try {
-                    setUserData(JSON.parse(userData));
-                } catch (error) {
-                    console.error('Error parsing userData:', error);
-                }
-            }
     
             const fetchChallengeStats = async () => {
                 if (!token) {
@@ -31,6 +23,7 @@ export default function Challenges() {
                 }
     
                 try {
+                    isLoading(true);
                     const response = await fetch('/api/challenge/read', {
                         headers: { 
                             'Authorization': `Bearer ${token}`,
@@ -47,6 +40,8 @@ export default function Challenges() {
                 } catch (error) {
                     console.error('Error fetching challenge stats:', error);
                     setError(error.message);
+                } finally {
+                    isLoading(false);
                 }
             };
     
@@ -55,6 +50,11 @@ export default function Challenges() {
     return(
         <ProtectedRoute>
             <AnimatedGradientBg>
+
+                {loading && (
+                    <Loading />
+                )}
+                
                 <div className="min-h-screen text-white">
                     {/* Sidebar */}
                         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

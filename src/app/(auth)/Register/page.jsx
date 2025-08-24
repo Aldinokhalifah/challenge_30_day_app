@@ -50,6 +50,7 @@ export default function Register() {
         }
 
         try {
+            setIsLoading(true);
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -69,7 +70,6 @@ export default function Register() {
                 confirmButtonText: 'Login'
             });
             
-            setIsLoading(true);
             router.push('/Login');
         } catch (error) {
             Swal.fire({

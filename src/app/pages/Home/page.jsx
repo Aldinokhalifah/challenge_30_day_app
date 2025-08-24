@@ -6,7 +6,6 @@ import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
 import AnimatedGradientBg from "@/app/components/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
-import { ActiveChallengesSection } from "@/app/components/Home/ActiveChallengeSection";
 import OverviewStats from "@/app/components/Home/OverviewStats";
 
 export default function HomePage() {
@@ -80,7 +79,6 @@ export default function HomePage() {
                             <Hero name={userData?.name} />
 
                             <div className="flex flex-col justify-center items-center gap-4 mt-20">
-                                {/* <ActiveChallengesSection challengeStats={challengeStats}/> */}
                                 <OverviewStats/>
                             </div>
                             </main>
