@@ -11,7 +11,7 @@ export default function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
-    const [loading, isLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     
     useEffect(() => {
             const token = localStorage.getItem('token');
@@ -23,7 +23,7 @@ export default function Challenges() {
                 }
     
                 try {
-                    isLoading(true);
+                    setLoading(true);
                     const response = await fetch('/api/challenge/read', {
                         headers: { 
                             'Authorization': `Bearer ${token}`,
@@ -41,7 +41,7 @@ export default function Challenges() {
                     console.error('Error fetching challenge stats:', error);
                     setError(error.message);
                 } finally {
-                    isLoading(false);
+                    setLoading(false);
                 }
             };
     

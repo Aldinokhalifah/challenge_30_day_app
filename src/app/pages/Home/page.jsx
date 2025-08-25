@@ -7,12 +7,14 @@ import { useEffect, useState } from "react";
 import AnimatedGradientBg from "@/app/components/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
+import Loading from "@/app/components/loading";
 
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ userData, setUserData] = useState(null);
     const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const userData = localStorage.getItem('userData');
@@ -33,6 +35,7 @@ export default function HomePage() {
             }
 
             try {
+                setLoading(true);
                 const response = await fetch('/api/challenge/read', {
                     headers: { 
                         'Authorization': `Bearer ${token}`,
@@ -49,6 +52,8 @@ export default function HomePage() {
             } catch (error) {
                 console.error('Error fetching challenge stats:', error);
                 setError(error.message);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -57,6 +62,11 @@ export default function HomePage() {
     return (
         <ProtectedRoute>
                 <AnimatedGradientBg>
+
+                    {loading && (
+                        <Loading />
+                    )}
+                    
                     <div className="min-h-screen text-white">
                         {/* Sidebar */}
                         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

@@ -2,9 +2,11 @@ import { useEffect,useState } from "react";
 import ChallengeCard from "../ui/Card";
 import Link from "next/link";
 import StartNewChallenge from "./StartNewChallenge";
+import CreateChallenge from "./Create/page";
 
-export function ActiveChallengesSection({ challengeStats }) {
+export function ActiveChallengesSection({ challengeStats, onChallengeCreated }) {
     const [filteredChallenges, setFilteredChallenges] = useState(challengeStats);
+    const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('newest'); // newest, oldest, progress, title
 
@@ -139,8 +141,8 @@ export function ActiveChallengesSection({ challengeStats }) {
                         </div>
                         
                         {/* Create Button */}
-                        <Link
-                            href="/challenges/create"
+                        <button
+                            onClick={() => setIsCreateChallengeOpen(true)}
                             className="group relative px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl text-sm text-white shadow-2xl hover:shadow-indigo-500/25 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -150,7 +152,7 @@ export function ActiveChallengesSection({ challengeStats }) {
                                     </svg>
                                     <span>New Challenge</span>
                                 </div>
-                        </Link>
+                        </button>
                     </div>
                 </div>
             )}
@@ -192,6 +194,17 @@ export function ActiveChallengesSection({ challengeStats }) {
                 )
             ) : (
                 <StartNewChallenge />
+            )}
+
+            {/* Create Challenge Modal */}
+            {isCreateChallengeOpen && (
+                <CreateChallenge 
+                    onClose={() => setIsCreateChallengeOpen(false)}
+                    onChallengeCreated={(newChallenge) => {
+                        setFilteredChallenges((prev) => [...prev, newChallenge]); 
+                        setIsCreateChallengeOpen(false);
+                    }}
+                />
             )}
         </div>
     );
