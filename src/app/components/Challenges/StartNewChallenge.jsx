@@ -1,4 +1,8 @@
+import { useState } from "react";
+import CreateChallenge from "./Create/page";
+
 export default function StartNewChallenge() {
+    const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
 
     return(
         <div className="flex flex-col items-center justify-center py-20 px-4 relative">
@@ -30,7 +34,9 @@ export default function StartNewChallenge() {
                     </p>
                 </div>
 
-                <button className="group relative px-10 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl font-bold text-white text-lg shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
+                <button
+                onClick={() => setIsCreateChallengeOpen(true)}
+                className="group relative px-10 py-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-3xl font-bold text-white text-lg shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div className="relative flex items-center gap-4">
                             <svg className="w-6 h-6 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,6 +47,17 @@ export default function StartNewChallenge() {
                         </div>
                 </button>
             </div>
+
+            {/* Create Challenge Modal */}
+            {isCreateChallengeOpen && (
+                <CreateChallenge 
+                    onClose={() => setIsCreateChallengeOpen(false)}
+                    onChallengeCreated={(newChallenge) => {
+                    setFilteredChallenges((prev) => [...prev, newChallenge]); 
+                        setIsCreateChallengeOpen(false);
+                    }}
+                />
+            )}
         </div>
     );
 }

@@ -24,6 +24,8 @@ export default function ChallengeCard({ data }) {
         return '🌱';
     };
 
+    const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
+
     return (
         <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
             
@@ -159,7 +161,7 @@ export default function ChallengeCard({ data }) {
                             })}
                         </div>
                         <div className="text-gray-400 text-xs">
-                            {Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24))} days ago
+                            {getDayStarted} days {getDayStarted > 0 ? 'ago' : 'later'}
                         </div>
                     </div>
                 </div>

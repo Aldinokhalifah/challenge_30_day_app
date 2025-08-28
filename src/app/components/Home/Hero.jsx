@@ -1,9 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Typed from 'typed.js';
+import CreateChallenge from '../Challenges/Create/page';
 
 export default function Hero({name}) {
+    const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
 
     const strings = [
         "Small progress is still progress.",
@@ -124,8 +126,8 @@ export default function Hero({name}) {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Link
-                                href="/challenges/create"
+                            <button
+                                onClick={() => setIsCreateChallengeOpen(true)}
                                 className="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl font-semibold text-white shadow-2xl hover:shadow-indigo-500/25 transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -135,7 +137,7 @@ export default function Hero({name}) {
                                     </svg>
                                     <span>Start New Challenge</span>
                                 </div>
-                            </Link>
+                            </button>
                             
                             <Link
                                 href="/pages/Challenges"
@@ -193,6 +195,17 @@ export default function Hero({name}) {
                         </div>
                     </div>
                 </div>
+
+                {/* Create Challenge Modal */}
+                {isCreateChallengeOpen && (
+                    <CreateChallenge 
+                        onClose={() => setIsCreateChallengeOpen(false)}
+                        onChallengeCreated={(newChallenge) => {
+                            setFilteredChallenges((prev) => [...prev, newChallenge]); 
+                                setIsCreateChallengeOpen(false);
+                            }}
+                    />
+                )}
             </div>
         </>
     );

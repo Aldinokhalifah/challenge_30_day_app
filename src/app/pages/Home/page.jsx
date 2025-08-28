@@ -27,42 +27,10 @@ export default function HomePage() {
                 console.error('Error parsing userData:', error);
             }
         }
-
-        const fetchChallengeStats = async () => {
-            if (!token) {
-                console.error('Token not found');
-                return;
-            }
-
-            try {
-                setLoading(true);
-                const response = await fetch('/api/challenge/read', {
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setChallengeStats(data.challenges);
-            } catch (error) {
-                console.error('Error fetching challenge stats:', error);
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchChallengeStats();
     }, []);
     return (
         <ProtectedRoute>
                 <AnimatedGradientBg>
-
                     {loading && (
                         <Loading />
                     )}

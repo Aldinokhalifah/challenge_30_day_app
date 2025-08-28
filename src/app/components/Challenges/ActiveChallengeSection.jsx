@@ -1,6 +1,5 @@
 import { useEffect,useState } from "react";
 import ChallengeCard from "../ui/Card";
-import Link from "next/link";
 import StartNewChallenge from "./StartNewChallenge";
 import CreateChallenge from "./Create/page";
 
