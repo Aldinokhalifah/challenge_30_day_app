@@ -18,7 +18,6 @@ export default function HomePage() {
 
     useEffect(() => {
         const userData = localStorage.getItem('userData');
-        const token = localStorage.getItem('token');
 
         if (userData) {
             try {

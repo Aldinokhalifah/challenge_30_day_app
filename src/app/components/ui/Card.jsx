@@ -1,7 +1,12 @@
+'use client';
+
+import { MoreVertical, Trash2 } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 
 export default function ChallengeCard({ data }) {
     const { customId, title, description, progress, completedDays, startDate } = data;
+    const [menuOpen, setMenuOpen] = useState(false);
     
     const getProgressGradient = (progress) => {
         if (progress >= 80) return 'from-emerald-400 via-green-500 to-teal-600';
@@ -25,6 +30,32 @@ export default function ChallengeCard({ data }) {
     };
 
     const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
+
+    const handleDelete = async (customId) => {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`/api/challenge/${customId}/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Delete failed:", errorText);
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Challenge deleted:", data.message);
+            // Refresh data di sini jika perlu
+            window.location.reload();
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
 
     return (
         <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
@@ -54,20 +85,39 @@ export default function ChallengeCard({ data }) {
                         </h3>
                     </div>
 
-                    {/* Floating action hint */}
-                    <Link
-                        href={`/challenge/${customId}`}
-                    >
-                        <div className="relative">
-                            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10 group-hover:rotate-12 group-hover:scale-110 transition-all duration-500">
-                                
-                                    <svg className="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                    </svg>
+                    <div className="flex items-center gap-2">
+                    {/* Titik tiga (More menu) */}
+                    <div className="relative">
+                        <button
+                            type="button"
+                            className="w-12 h-12 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10 transition-all duration-500"
+                            onClick={() => setMenuOpen((open) => !open)}
+                        >
+                            <MoreVertical className="w-6 h-6 text-indigo-400 group-hover:text-white transition-colors rotate-90" />
+                        </button>
+                        {/* Dropdown menu */}
+                        {menuOpen && (
+                            <div className="absolute right-0 mt-2 w-40 bg-slate-900 border border-white/10 rounded-xl shadow-lg z-20">
+                                <Link
+                                    href={`/challenge/${customId}`}
+                                    className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white rounded-t-xl transition"
+                                    onClick={() => setMenuOpen(false)}
+                                >
+                                    More Detail
+                                </Link>
+                                <button
+                                    className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-600/20 hover:text-white rounded-b-xl transition"
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        handleDelete(customId);
+                                    }}
+                                >
+                                    Delete
+                                </button>
                             </div>
-                            <div className="absolute -inset-2 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                    </Link>
+                        )}
+                    </div>
+            </div>
                 </div>
 
                 {/* Description with glass effect */}
