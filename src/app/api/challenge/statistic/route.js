@@ -26,9 +26,13 @@ export async function GET(req) {
         const totalChallenges = challenges.length;
         const completedChallenges = challenges.filter(c => c.progress >= 100).length;
         const activeChallenges = totalChallenges - completedChallenges;
-        const overallProgress = Math.round(
-        challenges.reduce((sum, c) => sum + (c.progress || 0), 0) / totalChallenges
-        );
+        let overallProgress = 0;
+        if (totalChallenges > 0) {
+            const sumProgress = challenges.reduce((sum, c) => sum + (c.progress || 0), 0);
+            overallProgress = Math.round(sumProgress / totalChallenges);
+            // Pastikan progress tidak lebih dari 100
+            overallProgress = Math.min(overallProgress, 100);
+        }
 
 
         return NextResponse.json({
