@@ -7,7 +7,7 @@ export async function DELETE(req,{params}) {
     await connectToDatabase();
 
     const userId = await verifyToken(req);
-    const customId = parseInt(params.customId);
+    const { customId } = await params;
 
     if(!userId) {
         return NextResponse.json(

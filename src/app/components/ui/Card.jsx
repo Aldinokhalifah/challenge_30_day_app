@@ -4,7 +4,7 @@ import { MoreVertical, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
-export default function ChallengeCard({ data }) {
+export default function ChallengeCard({ data, onDeleted }) {
     const { customId, title, description, progress, completedDays, startDate } = data;
     const [menuOpen, setMenuOpen] = useState(false);
     
@@ -50,8 +50,10 @@ export default function ChallengeCard({ data }) {
 
             const data = await response.json();
             console.log("Challenge deleted:", data.message);
-            // Refresh data di sini jika perlu
-            window.location.reload();
+            
+            if (response.ok) {
+                if (onDeleted) onDeleted(); // reload data di parent
+            }
         } catch (error) {
             console.error(error.message);
         }
@@ -80,7 +82,7 @@ export default function ChallengeCard({ data }) {
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight group-hover:from-indigo-300 group-hover:to-blue-400 transition-all duration-500">
+                        <h3 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight group-hover:from-indigo-300 group-hover:to-blue-400 transition-all duration-500 capitalize">
                             {title}
                         </h3>
                     </div>

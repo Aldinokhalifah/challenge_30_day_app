@@ -13,39 +13,50 @@ export default function Challenges() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
+    
+    const fetchChallengeStats = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('Token not found');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch('/api/challenge/read', {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            setChallengeStats(data.challenges);
+        } catch (error) {
+            console.error('Error fetching challenge stats:', error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fungsi untuk fetch ulang data
+    const reloadChallenges = async () => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/challenge/read', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        setChallengeStats(data.challenges);
+    };
+
     useEffect(() => {
-            const token = localStorage.getItem('token');
-    
-            const fetchChallengeStats = async () => {
-                if (!token) {
-                    console.error('Token not found');
-                    return;
-                }
-    
-                try {
-                    setLoading(true);
-                    const response = await fetch('/api/challenge/read', {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-    
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-    
-                    const data = await response.json();
-                    setChallengeStats(data.challenges);
-                } catch (error) {
-                    console.error('Error fetching challenge stats:', error);
-                    setError(error.message);
-                } finally {
-                    setLoading(false);
-                }
-            };
-    
-            fetchChallengeStats();
+        fetchChallengeStats();
     }, []);
     return(
         <ProtectedRoute>
@@ -74,7 +85,10 @@ export default function Challenges() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                                <ActiveChallengesSection challengeStats={challengeStats}/>
+                                <ActiveChallengesSection
+                                    challengeStats={challengeStats}
+                                    reloadChallenges={reloadChallenges} // kirim callback ke child
+                                />
                             </main>
                         </div>
                 </div>

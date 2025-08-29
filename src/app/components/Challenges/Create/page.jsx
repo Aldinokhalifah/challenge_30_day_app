@@ -28,7 +28,10 @@ export default function CreateChallenge({ onClose, onChallengeCreated }) {
             }
 
             const data = await response.json();
-            onClose();
+            if (response.ok) {
+                if (onChallengeCreated) onChallengeCreated(); // reload data di parent
+                onClose();
+            }
         } catch (error) {
             console.error('Error fetching challenge stats:', error);
             setError(error.message);
@@ -44,7 +47,7 @@ export default function CreateChallenge({ onClose, onChallengeCreated }) {
             )}
 
             <div className="fixed inset-0 backdrop-blur-md bg-white/30 shadow-xl flex items-center justify-center z-50">
-                <div className="bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl">
+                <div className="bg-gradient-to-l from-indigo-900 to-blue-900 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-bold">Create New Challenge</h2>
                         <button className="rotate-45 text-gray-500 cursor-pointer" onClick={onClose}>
@@ -60,7 +63,7 @@ export default function CreateChallenge({ onClose, onChallengeCreated }) {
                         <input
                             type="text"
                             placeholder="Title"
-                            className="w-full mb-4 p-2 border rounded-lg focus:ring focus:ring-blue-200"
+                            className="w-full mb-4 p-2 border rounded-lg"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
@@ -68,7 +71,7 @@ export default function CreateChallenge({ onClose, onChallengeCreated }) {
 
                         <textarea
                             placeholder="Description"
-                            className="w-full mb-4 p-2 border rounded-lg h-24 focus:ring focus:ring-blue-200"
+                            className="w-full mb-4 p-2 border rounded-lg h-24"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             required
@@ -77,7 +80,7 @@ export default function CreateChallenge({ onClose, onChallengeCreated }) {
                         <input 
                             placeholder="Start Date"
                             type="date"
-                            className="w-full mb-4 p-2 border rounded-lg focus:ring focus:ring-blue-200"
+                            className="w-full mb-4 p-2 border rounded-lg"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
                             required

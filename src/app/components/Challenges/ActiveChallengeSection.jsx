@@ -3,7 +3,7 @@ import ChallengeCard from "../ui/Card";
 import StartNewChallenge from "./StartNewChallenge";
 import CreateChallenge from "./Create/page";
 
-export function ActiveChallengesSection({ challengeStats, onChallengeCreated }) {
+export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
     const [filteredChallenges, setFilteredChallenges] = useState(challengeStats);
     const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -162,7 +162,11 @@ export function ActiveChallengesSection({ challengeStats, onChallengeCreated }) 
                     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8 lg:gap-10">
                         {filteredChallenges.map((challenge, idx) => (
                             <div key={idx} className="transform transition-all duration-500" style={{animationDelay: `${idx * 150}ms`}}>
-                                <ChallengeCard data={challenge} />
+                                <ChallengeCard
+                                    key={challenge.customId}
+                                    data={challenge}
+                                    onDeleted={reloadChallenges} // gunakan prop dari parent
+                                />
                             </div>
                         ))}
                     </div>
@@ -199,10 +203,7 @@ export function ActiveChallengesSection({ challengeStats, onChallengeCreated }) 
             {isCreateChallengeOpen && (
                 <CreateChallenge 
                     onClose={() => setIsCreateChallengeOpen(false)}
-                    onChallengeCreated={(newChallenge) => {
-                        setFilteredChallenges((prev) => [...prev, newChallenge]); 
-                        setIsCreateChallengeOpen(false);
-                    }}
+                    onChallengeCreated={reloadChallenges} // gunakan prop dari parent
                 />
             )}
         </div>
