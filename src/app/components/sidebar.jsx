@@ -3,13 +3,12 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import { LogOut, Home, CalendarCheck2, PlusCircle, BarChart3, User2, X } from 'lucide-react';
+import { LogOut, Home, CalendarCheck2, BarChart3, User2, X } from 'lucide-react';
 import Image from 'next/image';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: Home },
   { href: '/pages/Challenges', label: 'Challenges', icon: CalendarCheck2 },
-  { href: '/challenges/create', label: 'Create', icon: PlusCircle },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/profile', label: 'Profile', icon: User2 },
 ];

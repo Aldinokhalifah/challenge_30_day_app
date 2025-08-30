@@ -101,7 +101,7 @@ export default function ChallengeCard({ data, onDeleted }) {
                         {menuOpen && (
                             <div className="absolute right-0 mt-2 w-40 bg-slate-900 border border-white/10 rounded-xl shadow-lg z-20">
                                 <Link
-                                    href={`/challenge/${customId}`}
+                                    href={`/pages/Challenges/${customId}`}
                                     className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white rounded-t-xl transition"
                                     onClick={() => setMenuOpen(false)}
                                 >

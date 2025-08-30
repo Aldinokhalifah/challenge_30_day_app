@@ -13,6 +13,7 @@ export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ userData, setUserData] = useState(null);
     const [error, setError] = useState('');
+    const [challenge, setChallengeStats] = useState([]);
     const [loading, setLoading] = useState(false);
     const [overviewStats, setOverviewStats] = useState(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
