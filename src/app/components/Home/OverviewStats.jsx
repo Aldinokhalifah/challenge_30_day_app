@@ -2,42 +2,25 @@
 
 import { useEffect, useState } from "react";
 
-export default function OverviewStats() {
-    const [stats, setStats] = useState(null);
+export default function OverviewStats({ overviewStats }) {
     const [animatedValues, setAnimatedValues] = useState({});
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const token = localStorage.getItem('token');
-
-                const res = await fetch("/api/challenge/statistic", {
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+        // Animate numbers from 0 to actual value
+        if (overviewStats) {
+            setTimeout(() => {
+                setAnimatedValues({
+                    totalChallenges: overviewStats.totalChallenges,
+                    completedChallenges: overviewStats.completedChallenges,
+                    activeChallenges: overviewStats.activeChallenges,
+                    overallProgress: overviewStats.overallProgress
                 });
-                const data = await res.json();
-                setStats(data);
-                
-                // Animate numbers from 0 to actual value
-                setTimeout(() => {
-                    setAnimatedValues({
-                        totalChallenges: data.totalChallenges,
-                        completedChallenges: data.completedChallenges,
-                        activeChallenges: data.activeChallenges,
-                        overallProgress: data.overallProgress
-                    });
-                }, 300);
-            } catch (error) {
-                console.error("❌ Error fetch overview stats:", error);
-            }
-        };
-        fetchStats();
-    }, []);
+            }, 300);
+        }
+    }, [overviewStats]); 
 
     // Loading skeleton
-    if (!stats) {
+    if (!overviewStats) {
         return (
             <section className="mt-12 space-y-8">
                 <div className="text-center space-y-4">
@@ -67,7 +50,7 @@ export default function OverviewStats() {
         { 
             label: "Total Challenges", 
             value: animatedValues.totalChallenges || 0,
-            actualValue: stats.totalChallenges,
+            actualValue: overviewStats.totalChallenges,
             icon: "🎯",
             gradient: "from-blue-500 via-indigo-600 to-purple-700",
             glowColor: "blue-500/30",
@@ -76,7 +59,7 @@ export default function OverviewStats() {
         { 
             label: "Completed", 
             value: animatedValues.completedChallenges || 0,
-            actualValue: stats.completedChallenges,
+            actualValue: overviewStats.completedChallenges,
             icon: "🏆",
             gradient: "from-emerald-500 via-green-600 to-teal-700",
             glowColor: "emerald-500/30",
@@ -85,7 +68,7 @@ export default function OverviewStats() {
         { 
             label: "Active", 
             value: animatedValues.activeChallenges || 0,
-            actualValue: stats.activeChallenges,
+            actualValue: overviewStats.activeChallenges,
             icon: "⚡",
             gradient: "from-orange-500 via-amber-600 to-yellow-700",
             glowColor: "orange-500/30",
@@ -94,7 +77,7 @@ export default function OverviewStats() {
         { 
             label: "Progress", 
             value: `${animatedValues.overallProgress || 0} %`,
-            actualValue: stats.overallProgress,
+            actualValue: overviewStats.overallProgress,
             icon: "📊",
             gradient: "from-pink-500 via-rose-600 to-red-700",
             glowColor: "pink-500/30",

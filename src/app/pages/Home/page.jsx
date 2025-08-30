@@ -12,9 +12,11 @@ import Loading from "@/app/components/loading";
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ userData, setUserData] = useState(null);
-    const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [overviewStats, setOverviewStats] = useState(null);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     useEffect(() => {
         const userData = localStorage.getItem('userData');
@@ -27,11 +29,77 @@ export default function HomePage() {
             }
         }
     }, []);
+
+    // Fungsi fetch data challenge
+    const fetchChallengeStats = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        try {
+            setLoading(true);
+            const response = await fetch('/api/challenge/read', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch challenges');
+            const data = await response.json();
+            setChallengeStats(data.challenges);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchOverviewStats = async () => {
+        const token = localStorage.getItem('token');
+        const res = await fetch("/api/challenge/statistic", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setOverviewStats(data);
+    };
+
+    // Initial load
+    useEffect(() => {
+        const loadInitialData = async () => {
+            setIsInitialLoading(true);
+            try {
+                await Promise.all([
+                    fetchChallengeStats(),
+                    fetchOverviewStats()
+                ]);
+            } finally {
+                setIsInitialLoading(false);
+            }
+        };
+
+        loadInitialData();
+    }, []);
+
+     // Callback untuk reload setelah create/delete
+    const reloadAll = async () => {
+        setIsRefreshing(true);
+        try {
+            await Promise.all([
+                fetchChallengeStats(),
+                fetchOverviewStats()
+            ]);
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
     return (
         <ProtectedRoute>
                 <AnimatedGradientBg>
                     {loading && (
                         <Loading />
+                    )}
+
+                    {isRefreshing && (
+                        <Loading 
+                            message="Updating your progress..." 
+                            overlay={true}
+                        />
                     )}
                     
                     <div className="min-h-screen text-white">
@@ -53,10 +121,10 @@ export default function HomePage() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                            <Hero name={userData?.name} />
+                            <Hero name={userData?.name} reloadChallenge={reloadAll}/>
 
                             <div className="flex flex-col justify-center items-center gap-4 mt-20">
-                                <OverviewStats/>
+                                <OverviewStats overviewStats={overviewStats}/>
                             </div>
                             </main>
                         </div>

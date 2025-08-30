@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Typed from 'typed.js';
 import CreateChallenge from '../Challenges/Create/page';
 
-export default function Hero({name}) {
+export default function Hero({name, reloadChallenge}) {
     const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
 
     const strings = [
@@ -200,10 +200,7 @@ export default function Hero({name}) {
                 {isCreateChallengeOpen && (
                     <CreateChallenge 
                         onClose={() => setIsCreateChallengeOpen(false)}
-                        onChallengeCreated={(newChallenge) => {
-                            setFilteredChallenges((prev) => [...prev, newChallenge]); 
-                                setIsCreateChallengeOpen(false);
-                            }}
+                        onChallengeCreated={reloadChallenge}
                     />
                 )}
             </div>
