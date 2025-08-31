@@ -55,6 +55,7 @@ export default function HeroChallengeDetail({ challenge }) {
 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        {/* Completed */}
                         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
@@ -62,46 +63,46 @@ export default function HeroChallengeDetail({ challenge }) {
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-white">{completedDays}</div>
-                                        <div className="text-xs text-gray-400">Completed</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                        
-                                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                                            <Clock className="w-5 h-5 text-white" />
-                                        </div>
-                                    <div>
-                                        <div className="text-2xl font-bold text-white">{pendingDays}</div>
-                                            <div className="text-xs text-gray-400">Pending</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                        
-                                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                                            <Flame className="w-5 h-5 text-white" />
-                                        </div>
-                                        <div>
-                                            <div className="text-2xl font-bold text-white">{getStreakCount()}</div>
-                                                <div className="text-xs text-gray-400">Streak</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                        
-                                    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                                                <Target className="w-5 h-5 text-white" />
-                                            </div>
-                                            <div>
-                                                <div className="text-2xl font-bold text-white">{30 - completedDays}</div>
-                                                    <div className="text-xs text-gray-400">Remaining</div>
-                                        </div>
+                                    <div className="text-xs text-gray-400">Completed</div>
                                 </div>
                             </div>
+                        </div>
+                        {/* Pending */}
+                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                    <Clock className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-white">{pendingDays}</div>
+                                    <div className="text-xs text-gray-400">Pending</div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Streak */}
+                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                                    <Flame className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-white">{getStreakCount()}</div>
+                                    <div className="text-xs text-gray-400">Streak</div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Remaining */}
+                        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                                    <Target className="w-5 h-5 text-white" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-white">{30 - completedDays}</div>
+                                    <div className="text-xs text-gray-400">Remaining</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

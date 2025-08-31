@@ -80,7 +80,7 @@ export default function Challenges() {
                             >
                                 <Menu className="h-6 w-6" />
                             </button>
-                            <h1 className="ml-3 text-lg font-semibold">Challenge 30 Days App</h1>
+                            <h1 className="ml-3 text-lg font-semibold">Your Challenges</h1>
                             </header>
 
                             {/* Content */}
