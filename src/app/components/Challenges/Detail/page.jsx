@@ -7,7 +7,7 @@ import HeroChallengeDetail from "./Hero";
 import ProgressOverview from "./ProgresOverview";
 import DailyLogs from "./DailyLogs";
 
-export default function ChallengeDetail({ challenge }) {
+export default function ChallengeDetail({ challenge, reloadChallenges }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
@@ -36,7 +36,7 @@ export default function ChallengeDetail({ challenge }) {
                         <main className="flex-1 p-4 lg:p-8 space-y-8">
 
                             {/* Hero Card - Challenge Info */}
-                            <HeroChallengeDetail challenge={challenge}/>
+                            <HeroChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges}/>
 
                             {/* Progress Section */}
                             <ProgressOverview challenge={challenge}/>

@@ -1,10 +1,8 @@
-import { connectToDatabase } from "@/app/lib/mongoose";
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/app/lib/auth";
 import Challenge from "../../../../../../../models/Challenge";
 
 export async function PUT(req, {params}) {
-    await connectToDatabase();
     const userId = await verifyToken(req);
     const { customId, days } = params;
     const { day, note, status } = await req.json();

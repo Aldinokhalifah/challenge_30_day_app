@@ -1,10 +1,7 @@
-import { connectToDatabase } from "@/app/lib/mongoose";
 import User from "../../../../../models/User";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
-    await connectToDatabase();
-
     try {
         const body = await req.json();
         const { name, email, password } = body;

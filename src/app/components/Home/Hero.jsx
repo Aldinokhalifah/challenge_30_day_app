@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Typed from 'typed.js';
-import CreateChallenge from '../Challenges/Create/page';
+import ChallengeForm from '../Challenges/Create/page';
 
 export default function Hero({name, reloadChallenge}) {
     const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
@@ -198,7 +198,7 @@ export default function Hero({name, reloadChallenge}) {
 
                 {/* Create Challenge Modal */}
                 {isCreateChallengeOpen && (
-                    <CreateChallenge 
+                    <ChallengeForm 
                         onClose={() => setIsCreateChallengeOpen(false)}
                         onChallengeCreated={reloadChallenge}
                     />

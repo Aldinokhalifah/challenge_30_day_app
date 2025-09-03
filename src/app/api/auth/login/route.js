@@ -1,11 +1,8 @@
 import User from "../../../../../models/User";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/app/lib/mongoose";
-
 
 export async function POST(req) {
-    await connectToDatabase();
     const JWT_SECRET = process.env.JWT_SECRET;
     
     try {

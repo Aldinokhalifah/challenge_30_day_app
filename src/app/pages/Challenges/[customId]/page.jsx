@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import ChallengeDetail from "../../../components/Challenges/Detail/page";
 import Loading from "../../../components/loading";
@@ -43,9 +43,35 @@ export default function ChallengeDetailPage() {
         if (customId) fetchChallenge();
     }, [customId]);
 
+    const reloadChallenges = useCallback(async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            setLoading(true);
+            const res = await fetch(`/api/challenge/${customId}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!res.ok) throw new Error('Failed to fetch challenge');
+            
+            const data = await res.json();
+            setChallenge(data.challenge);
+        } catch (err) {
+            console.error("Error reloading challenge:", err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [customId]);
+
+
     if (loading) return <Loading />;
     if (error) return <div>Error: {error}</div>;
     if (!challenge) return <div>Challenge tidak ditemukan</div>;
     
-    return <ChallengeDetail challenge={challenge} />;
+    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} />;
 }

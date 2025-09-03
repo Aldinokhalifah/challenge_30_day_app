@@ -1,10 +1,8 @@
 import Challenge from '../../../../../models/Challenge';
 import { NextResponse } from 'next/server';
 import { verifyToken } from '../../../lib/auth';
-import { connectToDatabase } from '@/app/lib/mongoose';
 
 export async function POST(req) {
-    await connectToDatabase();
     const userId = await verifyToken(req);
     const body = await req.json();
 

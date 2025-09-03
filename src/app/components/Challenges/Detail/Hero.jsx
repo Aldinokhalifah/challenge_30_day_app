@@ -1,6 +1,9 @@
-import { Calendar, Target, Flame, CheckCircle, Clock } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Target, Flame, CheckCircle, Clock, PenBox } from "lucide-react";
+import ChallengeForm from "../Create/page";
 
-export default function HeroChallengeDetail({ challenge }) {
+export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
+    const [isEditChallengeOpen, setIsEditChallengeOpen] = useState(false);
     const completedDays = challenge.logs.filter(l => l.status === "completed").length;
     const pendingDays = challenge.logs.filter(l => l.status === "pending").length;
 
@@ -26,21 +29,33 @@ export default function HeroChallengeDetail({ challenge }) {
 
                 <div className="relative z-10 space-y-6">
                     {/* Status Badge */}
-                    <div className="flex items-center flex-col md:flex-row gap-4">
-                        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-600/20 to-green-600/20 backdrop-blur-sm rounded-2xl border border-emerald-500/30">
-                            <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                            <span className="text-emerald-300 font-semibold">Active Challenge</span>
+                    <div className="flex  md:justify-between flex-col md:flex-row gap-4">
+                        <button
+                        onClick={() => setIsEditChallengeOpen(true)}
+                        className="md:hidden text-white ml-[90%] cursor-pointer hover:text-slate-200">
+                            <PenBox />
+                        </button>
+                        <div className="flex items-center flex-col md:flex-row gap-4">
+                            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-600/20 to-green-600/20 backdrop-blur-sm rounded-2xl border border-emerald-500/30">
+                                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                                <span className="text-emerald-300 font-semibold">Active Challenge</span>
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/10">
+                                <Calendar className="w-4 h-4 text-indigo-400" />
+                                <span className="text-gray-300 text-sm">
+                                    Started {new Date(challenge.startDate).toLocaleDateString('id-ID', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric'
+                                    })}
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/10">
-                            <Calendar className="w-4 h-4 text-indigo-400" />
-                            <span className="text-gray-300 text-sm">
-                                Started {new Date(challenge.startDate).toLocaleDateString('id-ID', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric'
-                                })}
-                            </span>
-                        </div>
+                        <button 
+                        onClick={() => setIsEditChallengeOpen(true)}
+                        className="hidden md:block text-white right-4 cursor-pointer hover:text-slate-200">
+                            <PenBox />
+                        </button>
                     </div>
 
                     {/* Title and Description */}
@@ -106,6 +121,24 @@ export default function HeroChallengeDetail({ challenge }) {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Challenge Modal */}
+            {isEditChallengeOpen && (
+                <ChallengeForm
+                    mode="edit"
+                    initialData={challenge} // Langsung kirim challenge dari prop
+                    customId={challenge.customId}
+                    onClose={() => setIsEditChallengeOpen(false)}
+                    onChallengeCreated={async () => {
+                        try {
+                            await reloadChallenges();
+                            setIsEditChallengeOpen(false);
+                        } catch (error) {
+                            console.error('Error reloading:', error);
+                        }
+                    }}
+                />
+            )}
         </>
     );
 }

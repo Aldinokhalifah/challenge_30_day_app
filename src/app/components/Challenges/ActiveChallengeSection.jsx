@@ -1,11 +1,13 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import ChallengeCard from "../ui/Card";
 import StartNewChallenge from "./StartNewChallenge";
-import CreateChallenge from "./Create/page";
+import ChallengeForm from "./Create/page";
 
 export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
     const [filteredChallenges, setFilteredChallenges] = useState(challengeStats);
     const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
+    const [isEditChallengeOpen, setIsEditChallengeOpen] = useState(false);
+    const [challengeToEdit, setChallengeToEdit] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('newest'); // newest, oldest, progress, title
 
@@ -40,6 +42,12 @@ export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
 
         setFilteredChallenges(filtered);
     }, [challengeStats, searchQuery, sortBy]);
+
+    // buka edit modal
+    const handleEdit = (challenge) => {
+        setChallengeToEdit(challenge);
+        setIsEditChallengeOpen(true);
+    };
 
     return (
         <div className="w-full space-y-12">
@@ -166,6 +174,7 @@ export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
                                     key={challenge.customId}
                                     data={challenge}
                                     onDeleted={reloadChallenges} // gunakan prop dari parent
+                                    onEdit={handleEdit} // tambahkan form edit
                                 />
                             </div>
                         ))}
@@ -201,9 +210,27 @@ export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
 
             {/* Create Challenge Modal */}
             {isCreateChallengeOpen && (
-                <CreateChallenge 
+                <ChallengeForm 
                     onClose={() => setIsCreateChallengeOpen(false)}
                     onChallengeCreated={reloadChallenges} // gunakan prop dari parent
+                />
+            )}
+
+            {/* Edit Challenge Modal */}
+            {isEditChallengeOpen && (
+                <ChallengeForm
+                    mode="edit"
+                    initialData={challengeToEdit}
+                    customId={challengeToEdit?.customId}
+                    onClose={() => {
+                        setIsEditChallengeOpen(false);
+                        setChallengeToEdit(null);
+                    }}
+                    onChallengeCreated={() => {
+                        reloadChallenges();
+                        setIsEditChallengeOpen(false);
+                        setChallengeToEdit(null);
+                    }}
                 />
             )}
         </div>

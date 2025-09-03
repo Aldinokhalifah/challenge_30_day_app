@@ -1,11 +1,8 @@
-import { connectToDatabase } from "@/app/lib/mongoose";
 import { verifyToken } from "@/app/lib/auth";
 import { NextResponse } from "next/server";
 import Challenge from "../../../../../../../../models/Challenge";
 
 export async function DELETE(req, {params}) {
-    await connectToDatabase();
-
     const userId = await verifyToken(req);
     if(!userId) {
         return NextResponse.json(

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CreateChallenge from "./Create/page";
+import ChallengeForm from "./Create/page";
 
 export default function StartNewChallenge() {
     const [isCreateChallengeOpen, setIsCreateChallengeOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function StartNewChallenge() {
 
             {/* Create Challenge Modal */}
             {isCreateChallengeOpen && (
-                <CreateChallenge 
+                <ChallengeForm 
                     onClose={() => setIsCreateChallengeOpen(false)}
                     onChallengeCreated={(newChallenge) => {
                     setFilteredChallenges((prev) => [...prev, newChallenge]); 
