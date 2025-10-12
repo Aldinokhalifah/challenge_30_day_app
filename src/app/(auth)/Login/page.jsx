@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import AnimatedGradientBg from "@/app/components/animatedBgGradient";
+import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 
 export default function Login() {
     const [form, setForm] = useState({email: '', password: ''});
@@ -46,7 +46,7 @@ export default function Login() {
         router.push('/');
     } catch (error) {
         Swal.fire({
-            title: error.message || "Terjadi kesalahan pada server",
+            title: error.message || "Something Wrong With The Server",
             icon: 'error',
             confirmButtonText: 'OK'
         });

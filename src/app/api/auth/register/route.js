@@ -1,7 +1,10 @@
+import { connectToDatabase } from "@/app/lib/mongoose";
 import User from "../../../../../models/User";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
+    await connectToDatabase();
+    
     try {
         const body = await req.json();
         const { name, email, password } = body;
@@ -9,7 +12,7 @@ export async function POST(req) {
         const existingUser = await User.findOne({email});
         if(existingUser) {
             return NextResponse.json(
-                { message: 'Akun sudah terdaftar!'},
+                { message: 'Account Registered!'},
                 {status: 400}
             );
         }
@@ -20,7 +23,7 @@ export async function POST(req) {
          // Validasi input
         if (!name || !email || !password) {
             return NextResponse.json(
-                { message: 'Semua field harus diisi' },
+                { message: 'Fill Every Fields' },
                 { status: 400 }
             );
         }
@@ -29,7 +32,7 @@ export async function POST(req) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return NextResponse.json(
-                { message: 'Format email tidak valid' },
+                { message: 'Email Format Not Valid' },
                 { status: 400 }
             );
         }
@@ -44,7 +47,7 @@ export async function POST(req) {
         await newUser.save();
 
         return NextResponse.json({ 
-            message: "Registrasi berhasil", 
+            message: "Registration Succeed", 
             data: {
                 id: newUser.customId,
                 name: newUser.name,
@@ -53,7 +56,7 @@ export async function POST(req) {
         }, { status: 201 });
     } catch (error) {
         return NextResponse.json({
-            message: 'Registrasi gagal',
+            message: 'Registration Failed',
             error: error.message
         }, { status: 500 });
     }

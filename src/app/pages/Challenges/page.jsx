@@ -1,11 +1,11 @@
 'use client';
-import AnimatedGradientBg from "@/app/components/animatedBgGradient";
+import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import ProtectedRoute from "@/app/components/protectedRoute";
 import { useEffect, useState } from "react";
 import { Menu } from 'lucide-react';
-import Sidebar from "@/app/components/sidebar";
+import Sidebar from "@/app/components/ui/sidebar";
 import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChallengeSection";
-import Loading from "@/app/components/loading";
+import Loading from "@/app/components/ui/loading";
 
 export default function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

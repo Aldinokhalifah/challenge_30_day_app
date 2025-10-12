@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Loading from "../../loading";
+import Loading from "../../ui/loading";
 import { Plus } from "lucide-react";
 
 export default function ChallengeForm({

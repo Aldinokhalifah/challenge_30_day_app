@@ -1,4 +1,5 @@
-import { Award, Clock, CheckCircle, XCircle } from "lucide-react";
+import Link from "next/link";
+import { Award, Clock, CheckCircle, XCircle, ArrowBigRight, ArrowRight, ArrowRightToLine } from "lucide-react";
 
 export default function DailyLogs({ challenge }) {
 
@@ -33,15 +34,31 @@ export default function DailyLogs({ challenge }) {
             {/* Daily Logs Grid */}
             <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
                 <div className="space-y-6">
-                    {/* Header */}
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-                            <Award className="w-6 h-6 text-white" />
+                    {/* /* Header */}
+                    <div className="flex md:justify-between flex-col md:flex-row gap-4">
+                        <Link
+                            href={`/pages/Challenges/${challenge.customId}/Logs`}
+                            className="md:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center ml-[65%]"
+                        >
+                            <p className="transition-all">More Detail</p>
+                            <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
+                        </Link>
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                                <Award className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-white">Daily Log</h2>
+                                <p className="text-gray-400">Your 30-day journey tracker</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-2xl font-bold text-white">Daily Log</h2>
-                            <p className="text-gray-400">Your 30-day journey tracker</p>
-                        </div>
+                        <Link
+                            href={`/pages/Challenges/${challenge.customId}/Logs`}
+                            className="hidden text-gray-400 text-sm md:text-md md:flex group gap-1 items-center"
+                        >
+                            <p className="group-hover:ml-1 transition-all text-pretty">More Detail</p>
+                            <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
+                        </Link>
                     </div>
 
                     {/* Days Grid */}

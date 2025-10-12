@@ -1,13 +1,13 @@
 'use client';
 
 import ProtectedRoute from "../../components/protectedRoute";
-import Sidebar from "@/app/components/sidebar";
+import Sidebar from "@/app/components/ui/sidebar";
 import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
-import AnimatedGradientBg from "@/app/components/animatedBgGradient";
+import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
-import Loading from "@/app/components/loading";
+import Loading from "@/app/components/ui/loading";
 
 export default function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

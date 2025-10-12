@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import AnimatedGradientBg from "@/app/components/animatedBgGradient";
+import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 
 
 export default function Register() {
@@ -33,7 +33,7 @@ export default function Register() {
         if (!emailRegex.test(form.email)) {
             Swal.fire({
                 title: "Error",
-                text: "Format email tidak valid",
+                text: "Email Format Not Valid",
                 icon: "error"
             });
             return;
@@ -43,7 +43,7 @@ export default function Register() {
         if (form.password.length < 6) {
             Swal.fire({
                 title: "Error",
-                text: "Password minimal 6 karakter",
+                text: "Password minimun require is 6 characters",
                 icon: "error"
             });
             return;
@@ -65,7 +65,7 @@ export default function Register() {
             
             await Swal.fire({
                 title: 'Success',
-                text: 'Akun telah berhasil dibuat',
+                text: 'Account has been made',
                 icon: 'success',
                 confirmButtonText: 'Login'
             });
@@ -73,7 +73,7 @@ export default function Register() {
             router.push('/Login');
         } catch (error) {
             Swal.fire({
-                title: error.message || "Terjadi kesalahan pada server",
+                title: error.message || "Something Wrong With The Server",
                 icon: 'error',
                 confirmButtonText: 'OK'
             });

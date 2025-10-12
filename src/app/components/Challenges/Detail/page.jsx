@@ -1,7 +1,7 @@
 import { useState } from "react";
-import AnimatedGradientBg from "../../animatedBgGradient";
+import AnimatedGradientBg from "../../ui/animatedBgGradient";
 import ProtectedRoute from "../../protectedRoute";
-import Sidebar from "../../sidebar";
+import Sidebar from "../../ui/sidebar";
 import { Menu } from "lucide-react";
 import HeroChallengeDetail from "./Hero";
 import ProgressOverview from "./ProgresOverview";

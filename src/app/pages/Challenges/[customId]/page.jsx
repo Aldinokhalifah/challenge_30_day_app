@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import ChallengeDetail from "../../../components/Challenges/Detail/page";
-import Loading from "../../../components/loading";
+import Loading from "../../../components/ui/loading";
 
 export default function ChallengeDetailPage() {
     const { customId } = useParams();
@@ -71,7 +71,7 @@ export default function ChallengeDetailPage() {
 
     if (loading) return <Loading />;
     if (error) return <div>Error: {error}</div>;
-    if (!challenge) return <div>Challenge tidak ditemukan</div>;
+    if (!challenge) return <div>Challenges Not Found</div>;
     
     return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} />;
 }

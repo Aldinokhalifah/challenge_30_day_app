@@ -1,8 +1,10 @@
+import { connectToDatabase } from "@/app/lib/mongoose";
 import User from "../../../../../models/User";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
+    await connectToDatabase();
     const JWT_SECRET = process.env.JWT_SECRET;
     
     try {
@@ -20,7 +22,7 @@ export async function POST(req) {
         const isMatch = await findUser.matchPassword(password);
         if (!isMatch) {
             return NextResponse.json(
-                { message: 'Password salah' },
+                { message: 'Wrong Password' },
                 { status: 401 }
             );
         }
@@ -28,7 +30,7 @@ export async function POST(req) {
         const token = jwt.sign({ id: findUser._id}, JWT_SECRET, { expiresIn: '1d'});
 
         return NextResponse.json({
-            message: 'Login berhasil',
+            message: 'Login Succeed',
             token,
             userData: {
                 id: findUser.customId,
@@ -40,7 +42,7 @@ export async function POST(req) {
         console.error('Login error:', error);
         return NextResponse.json(
             { 
-                message: 'Gagal login',
+                message: 'Login Failed',
                 error: error.message
             },
             { status: 500 }

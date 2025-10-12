@@ -5,8 +5,7 @@ import Challenge from "../../../../../../../models/Challenge";
 export async function PUT(req, {params}) {
     const userId = await verifyToken(req);
     const { customId, days } = params;
-    const { day, note, status } = await req.json();
-
+    const { note, status } = await req.json();
 
     if(!userId) {
         return NextResponse.json(
@@ -15,8 +14,16 @@ export async function PUT(req, {params}) {
         )
     }
 
-    const dayNumber = parseInt(params.days);
+    const dayNumber = parseInt(days); 
     const challengeId = parseInt(customId);
+
+    // Validasi note dari request body
+    if(!note || note.trim() === "") {
+        return NextResponse.json(
+            {message: `Note tidak boleh kosong`},
+            {status: 400}
+        )
+    }
 
     const challenge = await Challenge.findOne( {customId: challengeId, userId} );
 
@@ -27,7 +34,7 @@ export async function PUT(req, {params}) {
         )
     }
 
-    const logExists = await challenge.logs.find(log => log.day === dayNumber);
+    const logExists = challenge.logs.find(log => log.day === dayNumber);
     
     if(!logExists) {
         return NextResponse.json(
@@ -36,20 +43,21 @@ export async function PUT(req, {params}) {
         )
     }
 
-    if(!logExists.note ||logExists.note.trim() === "") {
+    // Update log dengan note dan status baru
+    const result = await Challenge.updateOne(
+        { customId: challengeId, userId, "logs.day": dayNumber },
+        { $set: {
+            "logs.$.status": status,
+            "logs.$.note": note,
+            "logs.$.date": new Date()
+        }}
+    );
+
+    if(result.modifiedCount === 0) {
         return NextResponse.json(
-            {message: `Log hari ke-${dayNumber} belum terisi`},
-            {status: 400}
+            {message: 'Gagal memperbarui log'},
+            {status: 500}
         )
-    } else {
-        const result = await Challenge.updateOne(
-            { customId: challengeId, userId, "logs.day": dayNumber },
-            { $set: {
-                "logs.$.status": status,
-                "logs.$.note": note,
-                "logs.$.date": new Date()
-            }}
-        );
     }
 
     const updatedChallenge = await Challenge.findOne({ customId: challengeId, userId });
