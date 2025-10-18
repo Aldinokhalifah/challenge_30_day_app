@@ -7,6 +7,7 @@ import Link from "next/link";
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const { customId, title, description, progress, completedDays, startDate } = data;
     const [menuOpen, setMenuOpen] = useState(false);
+    const progressPercentage = (completedDays / 30) * 100;
     
     const getProgressGradient = (progress) => {
         if (progress >= 80) return 'from-emerald-400 via-green-500 to-teal-600';
@@ -74,9 +75,9 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                     <div className="flex-1 space-y-3">
                         {/* Status badge */}
                         <div className="flex items-center gap-2">
-                            <div className={`px-3 py-1 bg-gradient-to-r ${getProgressGradient(progress)} rounded-full flex items-center gap-2`}>
-                                <span className="text-white text-xs font-bold">{getStatusIcon(progress)}</span>
-                                <span className="text-white text-xs font-bold">{progress.toFixed(0)}%</span>
+                            <div className={`px-3 py-1 bg-gradient-to-r ${getProgressGradient(progressPercentage)} rounded-full flex items-center gap-2`}>
+                                <span className="text-white text-xs font-bold">{getStatusIcon(progressPercentage)}</span>
+                                <span className="text-white text-xs font-bold">{progressPercentage.toFixed(0)}%</span>
                             </div>
                             <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
                         </div>
@@ -161,7 +162,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                                 strokeWidth="6"
                                 fill="transparent"
                                 strokeDasharray={`${2 * Math.PI * 45}`}
-                                strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
+                                strokeDashoffset={`${2 * Math.PI * 45 * (1 - progressPercentage / 100)}`}
                                 className="transition-all duration-1000 ease-out"
                                 strokeLinecap="round"
                             />
@@ -187,13 +188,13 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                     <div className="flex-1 space-y-3">
                         <div className="flex items-center justify-between">
                             <span className="text-gray-400 text-sm">Progress</span>
-                            <span className="text-white font-semibold">{progress.toFixed(1)}%</span>
+                            <span className="text-white font-semibold">{progressPercentage.toFixed(0)}%</span>
                         </div>
                         
                         <div className="relative h-2 bg-slate-800/60 rounded-full overflow-hidden">
                             <div 
-                                className={`h-full bg-gradient-to-r ${getProgressGradient(progress)} rounded-full transition-all duration-1000 ease-out relative`}
-                                style={{ width: `${progress}%` }}
+                                className={`h-full bg-gradient-to-r ${getProgressGradient(progressPercentage)} rounded-full transition-all duration-1000 ease-out relative`}
+                                style={{ width: `${progressPercentage}%` }}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
                             </div>

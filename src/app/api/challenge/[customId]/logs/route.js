@@ -4,7 +4,7 @@ import Challenge from "../../../../../../models/Challenge";
 
 export async function GET(req, {params}) {
     const userId = await verifyToken(req);
-    const customId = parseInt(params.customId);
+    const {customId} = await params;
 
     if(!userId) {
         return NextResponse.json(
@@ -13,7 +13,9 @@ export async function GET(req, {params}) {
         )
     }
     
-    const challenge = await Challenge.findOne( {customId: customId, userId});
+    const challengeId = parseInt(customId);
+
+    const challenge = await Challenge.findOne( {customId: challengeId, userId});
 
     if(!challenge) {
         return NextResponse.json(
