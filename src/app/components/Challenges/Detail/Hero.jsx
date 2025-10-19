@@ -2,21 +2,12 @@ import { useState } from "react";
 import { Calendar, Target, Flame, CheckCircle, Clock, PenBox } from "lucide-react";
 import ChallengeForm from "../Create/page";
 
-export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
+export default function HeroChallengeDetail({ challenge, reloadChallenges, statistic }) {
     const [isEditChallengeOpen, setIsEditChallengeOpen] = useState(false);
-    const completedDays = challenge.logs.filter(l => l.status === "completed").length;
-    const pendingDays = challenge.logs.filter(l => l.status === "pending").length;
-
-    const getStreakCount = () => {
-        let currentStreak = 0;
-        for (let i = challenge.logs.length - 1; i >= 0; i--) {
-            if (challenge.logs[i].status === "completed") {
-                currentStreak++;
-            } else {
-                break;
-            }
-        }
-        return currentStreak;
+    const stats = statistic || {
+        completedDays: challenge.logs.filter(l => l.status === "completed").length,
+        pendingDays: challenge.logs.filter(l => l.status === "pending").length,
+        longestStreak: getStreakCount()
     };
 
     return(
@@ -77,7 +68,7 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
                                     <CheckCircle className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-white">{completedDays}</div>
+                                    <div className="text-2xl font-bold text-white">{stats.completedDays}</div>
                                     <div className="text-xs text-gray-400">Completed</div>
                                 </div>
                             </div>
@@ -89,7 +80,7 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
                                     <Clock className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-white">{pendingDays}</div>
+                                    <div className="text-2xl font-bold text-white">{stats.pendingDays}</div>
                                     <div className="text-xs text-gray-400">Pending</div>
                                 </div>
                             </div>
@@ -101,7 +92,7 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
                                     <Flame className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-white">{getStreakCount()}</div>
+                                    <div className="text-2xl font-bold text-white">{stats.longestStreak}</div>
                                     <div className="text-xs text-gray-400">Streak</div>
                                 </div>
                             </div>
@@ -113,7 +104,7 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges }) {
                                     <Target className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-white">{30 - completedDays}</div>
+                                    <div className="text-2xl font-bold text-white">{stats.pendingDays}</div>
                                     <div className="text-xs text-gray-400">Remaining</div>
                                 </div>
                             </div>

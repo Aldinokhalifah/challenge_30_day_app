@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Award, Clock, CheckCircle, XCircle, ArrowBigRight, ArrowRight, ArrowRightToLine } from "lucide-react";
+import { Award, Clock, CheckCircle, XCircle, ArrowRightToLine } from "lucide-react";
 
 export default function DailyLogs({ challenge }) {
 

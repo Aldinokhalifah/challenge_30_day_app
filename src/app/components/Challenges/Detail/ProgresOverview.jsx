@@ -1,8 +1,10 @@
 import { TrendingUp } from "lucide-react";
 
-export default function ProgressOverview({ challenge }) {
-    const completedDays = challenge.logs.filter(l => l.status === "completed").length;
-    const progressPercentage = (completedDays / 30) * 100;
+export default function ProgressOverview({ challenge, statistic }) {
+    const stats = statistic || {
+        completedDays : challenge.logs.filter(l => l.status === "completed").length,
+        progressPercentage : (completedDays / 30) * 100
+    };
         
     return (
         <>
@@ -43,7 +45,7 @@ export default function ProgressOverview({ challenge }) {
                                     strokeWidth="12"
                                     fill="transparent"
                                     strokeDasharray={`${2 * Math.PI * 90}`}
-                                    strokeDashoffset={`${2 * Math.PI * 90 * (1 - progressPercentage / 100)}`}
+                                    strokeDashoffset={`${2 * Math.PI * 90 * (1 - stats.progressPercentage / 100)}`}
                                     className="transition-all duration-1000 ease-out"
                                     strokeLinecap="round"
                                 />
@@ -58,9 +60,9 @@ export default function ProgressOverview({ challenge }) {
                             </svg>
                             {/* Center content */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <div className="text-4xl font-black text-white">{Math.round(progressPercentage)}%</div>
+                                <div className="text-4xl font-black text-white">{Math.round(stats.progressPercentage)}%</div>
                                 <div className="text-gray-400 text-sm">Complete</div>
-                                <div className="text-white font-semibold mt-1">{completedDays}/30 days</div>
+                                <div className="text-white font-semibold mt-1">{stats.completedDays}/30 days</div>
                             </div>
                         </div>
                     </div>
@@ -69,12 +71,12 @@ export default function ProgressOverview({ challenge }) {
                     <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm text-gray-400">
                             <span>Daily Progress</span>
-                            <span>{completedDays} of 30 days completed</span>
+                            <span>{stats.completedDays} of 30 days completed</span>
                         </div>
                         <div className="relative h-4 bg-slate-800/60 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out relative"
-                                style={{ width: `${progressPercentage}%` }}
+                                style={{ width: `${stats.progressPercentage}%` }}
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
                             </div>

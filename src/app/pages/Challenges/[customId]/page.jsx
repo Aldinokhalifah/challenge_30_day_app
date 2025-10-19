@@ -8,6 +8,7 @@ import Loading from "../../../components/ui/loading";
 export default function ChallengeDetailPage() {
     const { customId } = useParams();
     const [challenge, setChallenge] = useState(null);
+    const [statistic, setStatistic] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -21,26 +22,40 @@ export default function ChallengeDetailPage() {
             }
 
             try {
-                const res = await fetch(`/api/challenge/${customId}`, {
-                    headers: { 
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!res.ok) throw new Error('Failed to fetch challenge');
-                
-                const data = await res.json();
-                setChallenge(data.challenge);
+                const [challengeRes, statsRes] = await Promise.all([
+                    fetch(`/api/challenge/${customId}`, {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch(`/api/challenge/${customId}/statistic`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-type': 'application/json'
+                        }
+                    })
+                ]);
+
+                if (!challengeRes.ok) throw new Error('Failed to fetch challenge');
+                if (!statsRes.ok) throw new Error('Failed to fetch statistics');
+
+                const [challengeData, statsData] = await Promise.all([
+                    challengeRes.json(),
+                    statsRes.json()
+                ]);
+
+                setChallenge(challengeData.challenge);
+                setStatistic(statsData.statistic);
             } catch (err) {
-                console.error("Error fetching challenge:", err);
+                console.error("Error fetching data:", err);
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         }
 
-        if (customId) fetchChallenge();
+        fetchChallenge();
     }, [customId]);
 
     const reloadChallenges = useCallback(async () => {
@@ -73,5 +88,5 @@ export default function ChallengeDetailPage() {
     if (error) return <div>Error: {error}</div>;
     if (!challenge) return <div>Challenges Not Found</div>;
     
-    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} />;
+    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic} />;
 }

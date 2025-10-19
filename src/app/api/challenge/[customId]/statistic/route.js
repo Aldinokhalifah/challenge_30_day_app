@@ -58,17 +58,18 @@ export async function GET(req, {params}) {
 
     return NextResponse.json(
         {
-            totalDays,
-            completedDays,
-            pendingDays,
-            progressPercentage,
-            totalStreak,
-            averageStreak,
-            longestStreak,
-            insight
+            message: 'Mendapatkan Semua Statistic',
+            statistic: {
+                totalDays,
+                completedDays,
+                pendingDays,
+                progressPercentage,
+                totalStreak,
+                averageStreak,
+                longestStreak,
+                insight
+            }
         },
-        {
-            status: 200
-        }
-    )
+        { status: 200 }
+    );
 }
