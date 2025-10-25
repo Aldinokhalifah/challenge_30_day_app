@@ -14,7 +14,7 @@ export async function POST(req) {
         const findUser = await User.findOne({email});
         if(!findUser) {
             return NextResponse.json(
-                { message: 'User tidak ditemukan' },
+                { message: 'User Not Found' },
                 { status: 404 }
             );
         }

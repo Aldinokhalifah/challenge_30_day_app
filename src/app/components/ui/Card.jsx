@@ -33,30 +33,34 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
 
     const handleDelete = async (customId) => {
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`/api/challenge/${customId}/delete`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+        const confirmation = window.confirm("Are you sure wanto to delete this challenge?");
+
+        if(confirmation) {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`/api/challenge/${customId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("Delete failed:", errorText);
+                    return;
                 }
-            });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Delete failed:", errorText);
-                return;
+                const data = await response.json();
+                console.log("Challenge deleted:", data.message);
+                
+                if (response.ok) {
+                    if (onDeleted) onDeleted(); // reload data di parent
+                }
+            } catch (error) {
+                console.error(error.message);
             }
-
-            const data = await response.json();
-            console.log("Challenge deleted:", data.message);
-            
-            if (response.ok) {
-                if (onDeleted) onDeleted(); // reload data di parent
-            }
-        } catch (error) {
-            console.error(error.message);
         }
     }
 
