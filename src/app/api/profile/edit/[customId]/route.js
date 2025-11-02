@@ -53,10 +53,18 @@ export async function PUT(req, {params}) {
             );
         }
 
+        const existingUser = await User.findOne({ email, customId });
+        if (existingUser) {
+            return NextResponse.json(
+                { message: "Email already in use" },
+                { status: 400 }
+            );
+        }
+
         const updatedUser = await user.save();
 
         return NextResponse.json(
-            { message: "User berhasil diupdate", updated: updatedUser },
+            { message: "User updated", updated: updatedUser },
             { status: 200 }
         );
     } catch (error) {

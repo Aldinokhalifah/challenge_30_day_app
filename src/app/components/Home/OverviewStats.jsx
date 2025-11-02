@@ -152,29 +152,6 @@ export default function OverviewStats({ overviewStats }) {
                                     {item.label}
                                 </p>
                             </div>
-
-                            {/* Progress indicator for non-progress cards */}
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-xs text-gray-500">
-                                    <span>{item.label === 'Progress' ? 'Progress' : 'Overall'}</span>
-                                    <span>
-                                        {item.label === 'Progress' 
-                                            ? `${item.value}` 
-                                            : `+${item.value}%`
-                                        }
-                                    </span>
-                                </div>
-                                <div className="w-full bg-slate-800/60 rounded-full h-1.5">
-                                    <div 
-                                        className={`bg-gradient-to-r ${item.gradient} h-1.5 rounded-full transition-all duration-1000 ease-out`}
-                                        style={{ 
-                                            width: item.actualValue > 0 
-                                                ? `${Math.min(item.actualValue)}%`
-                                                : `0%`
-                                        }}
-                                    ></div>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Hover glow effect */}
