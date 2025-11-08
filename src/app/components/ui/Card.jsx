@@ -8,6 +8,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const { customId, title, description, progress, completedDays, startDate } = data;
     const [menuOpen, setMenuOpen] = useState(false);
     const progressPercentage = (completedDays / 30) * 100;
+    const [isPublic, setIsPublic] = useState(Boolean(data?.isPublic));
     
     const getProgressGradient = (progress) => {
         if (progress >= 80) return 'from-emerald-400 via-green-500 to-teal-600';
@@ -64,6 +65,33 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
         }
     }
 
+    const handleTogglePublic = async (customId, newStatus) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
+                method: 'PUT',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ isPublic: newStatus })
+            });
+
+            if(!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || "Failed to update challenge visibility");
+            }
+
+            const resData = await response.json();
+            console.log("Visibility updated: ", resData.message);
+
+            setIsPublic(Boolean(resData?.challenge?.isPublic ?? newStatus));
+            if (onDeleted) onDeleted();
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     return (
         <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
             
@@ -116,11 +144,36 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                                 </button>
                                 <Link
                                     href={`/pages/Challenges/${customId}`}
-                                    className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white rounded-t-xl transition"
+                                    className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white transition"
                                     onClick={() => setMenuOpen(false)}
                                 >
                                     More Detail
                                 </Link>
+                                <button
+                                    className={`block w-full text-left px-4 py-2 text-sm ${
+                                        data.isPublic
+                                        ? "text-yellow-400 hover:bg-yellow-600/20 hover:text-white"
+                                        : "text-green-400 hover:bg-green-600/20 hover:text-white"
+                                    } transition`}
+                                    onClick={() => {
+                                        setMenuOpen(false);
+                                        handleTogglePublic(customId, !data.isPublic);
+                                    }}
+                                    >
+                                    {data.isPublic ? "Make Private" : "Make Public"}
+                                </button>
+                                {isPublic && (
+                                    <button
+                                        onClick={() => {
+                                        navigator.clipboard.writeText(`${window.location.origin}/pages/Challenge_public/${customId}`);
+                                        alert("Public URL copied to clipboard!");
+                                        }}
+                                        className="w-full text-left px-4 py-2 text-sm text-indigo-400 hover:bg-indigo-600/20 transition"
+                                    >
+                                        Share Public Link
+                                    </button>
+                                )}
+
                                 <button
                                     className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-600/20 hover:text-white rounded-b-xl transition"
                                     onClick={() => {

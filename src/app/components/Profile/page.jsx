@@ -194,7 +194,7 @@ export default function ProfilePage() {
             const data = await response.json();
             console.log("User deleted:", data.message);
 
-            router.push('/');
+            router.push('/Login');
         } catch (error) {
             console.error(error);
         }
@@ -237,7 +237,7 @@ export default function ProfilePage() {
                             </div>
                             <div>
                                 <p className="text-sm text-slate-600 font-medium">Total {profile.totalChallenges > 1 ? 'Challenges' : 'Challenge'}</p>
-                                <p className="text-3xl font-bold text-indigo-600">{profile.totalChallenges}</p>
+                                <p className="text-3xl font-bold text-indigo-600">{profile.totalChallenges < 1 ? 'No Challenge Found' : profile.totalChallenges}</p>
                             </div>
                             </div>
                         </div>
