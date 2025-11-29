@@ -1,4 +1,6 @@
 'use client';
+
+import React from "react";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import ProtectedRoute from "@/app/components/protectedRoute";
 import { useEffect, useState } from "react";
@@ -7,7 +9,7 @@ import Sidebar from "@/app/components/ui/sidebar";
 import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChallengeSection";
 import Loading from "@/app/components/ui/loading";
 
-export default function Challenges() {
+function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
@@ -96,3 +98,5 @@ export default function Challenges() {
         </ProtectedRoute>
     );
 }
+
+export default React.memo(Challenges);

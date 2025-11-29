@@ -6,8 +6,9 @@ import Loading from "@/app/components/ui/loading";
 import ProtectedRoute from "@/app/components/protectedRoute";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Sidebar from "@/app/components/ui/sidebar";
-import { Menu } from "lucide-react";
+import { ArrowRightToLine, Menu } from "lucide-react";
 import LogCard from "@/app/components/ui/Log";
+import Link from "next/link";
 
 
 export default function Logs() {
@@ -62,7 +63,7 @@ export default function Logs() {
                     <div className="lg:ml-52 flex flex-col min-h-screen">
 
                         {/* Header */}
-                        <header className="sticky top-0 z-30 flex items-center bg-slate-900/40 backdrop-blur-md border-b border-white/10 px-4 py-3 lg:hidden">
+                        <header className="sticky top-0 z-30 flex items-center justify-between bg-slate-900/40 backdrop-blur-md border-b border-white/10 px-4 py-3 lg:hidden">
                             <button
                                 onClick={() => setSidebarOpen(true)}
                                 className="p-2 rounded-lg hover:bg-white/10 text-indigo-200 transition-colors"
@@ -70,16 +71,32 @@ export default function Logs() {
                                 <Menu className="h-6 w-6" />
                             </button>
                             <h1 className="ml-3 text-lg font-semibold text-white">Logs Progress</h1>
+                            <Link
+                                href={`/pages/Challenges/${customId}`}
+                                className="md:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center"
+                            >
+                                <p className="transition-all">Back</p>
+                                <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
+                            </Link>
                         </header>
                         
                         {/* Content */}
                         <main className="flex-1 p-4 lg:p-8 space-y-8">
                             {/* Page Title - Desktop */}
-                            <div className="hidden lg:block">
-                                <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
-                                    Logs Progress
-                                </h1>
-                                <p className="text-gray-400">Track and update your daily challenge status</p>
+                            <div className="hidden lg:flex lg:justify-between">
+                                <div className="">
+                                    <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
+                                        Logs Progress
+                                    </h1>
+                                    <p className="text-gray-400">Track and update your daily challenge status</p>
+                                </div>
+                                <Link
+                                    href={`/pages/Challenges/${customId}`}
+                                        className="hidden text-gray-400 text-sm md:text-md md:flex group gap-1 items-center"
+                                    >
+                                        <p className="transition-all">Back</p>
+                                        <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
+                                </Link>
                             </div>
 
                             {/* Days Grid */}

@@ -1,5 +1,6 @@
 'use client';
 
+import React from "react";
 import ProtectedRoute from "../../components/protectedRoute";
 import Sidebar from "@/app/components/ui/sidebar";
 import { Menu } from 'lucide-react';
@@ -9,7 +10,7 @@ import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
 import Loading from "@/app/components/ui/loading";
 
-export default function HomePage() {
+function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ userData, setUserData] = useState(null);
     const [error, setError] = useState('');
@@ -134,3 +135,5 @@ export default function HomePage() {
         </ProtectedRoute>
     );
 }
+
+export default React.memo(HomePage);
