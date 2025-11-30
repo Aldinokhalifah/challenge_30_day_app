@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Calendar, Target, Flame, CheckCircle, Clock, PenBox } from "lucide-react";
 import ChallengeForm from "../Create/page";
 
 export default function HeroChallengeDetail({ challenge, reloadChallenges, statistic }) {
     const [isEditChallengeOpen, setIsEditChallengeOpen] = useState(false);
+    
     const stats = statistic || {
-        completedDays: challenge.logs.filter(l => l.status === "completed").length,
-        pendingDays: challenge.logs.filter(l => l.status === "pending").length,
+        completedDays: useMemo(() => {
+            return challenge.logs.filter(l => l.status === "completed").length
+        }, [challenge.logs]),
+        pendingDays: useMemo(() => {
+            return challenge.logs.filter(l => l.status === "pending").length
+        }, [challenge.logs]),
         longestStreak: getStreakCount()
     };
+
+    const handleOpenEdit = useCallback(() => {
+        setIsEditChallengeOpen(true);
+    }, []);
+
+    const handleCloseEdit = useCallback(() => {
+        setIsEditChallengeOpen(false);
+    }, []);
+
+    const handleChallengeUpdated = useCallback(async () => {
+        try {
+            await reloadChallenges();
+            setIsEditChallengeOpen(false);
+        } catch (error) {
+            console.error('Error reloading:', error);
+        }
+    }, [reloadChallenges]);
 
     return(
         <>
@@ -20,10 +42,11 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges, stati
 
                 <div className="relative z-10 space-y-6">
                     {/* Status Badge */}
-                    <div className="flex  md:justify-between flex-col md:flex-row gap-4">
+                    <div className="flex md:justify-between flex-col md:flex-row gap-4">
                         <button
-                        onClick={() => setIsEditChallengeOpen(true)}
-                        className="md:hidden text-white ml-[90%] cursor-pointer hover:text-slate-200">
+                            onClick={handleOpenEdit}
+                            className="md:hidden text-white ml-[90%] cursor-pointer hover:text-slate-200"
+                        >
                             <PenBox />
                         </button>
                         <div className="flex items-center flex-col md:flex-row gap-4">
@@ -43,8 +66,9 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges, stati
                             </div>
                         </div>
                         <button 
-                        onClick={() => setIsEditChallengeOpen(true)}
-                        className="hidden md:block text-white right-4 cursor-pointer hover:text-slate-200">
+                            onClick={handleOpenEdit}
+                            className="hidden md:block text-white right-4 cursor-pointer hover:text-slate-200"
+                        >
                             <PenBox />
                         </button>
                     </div>
@@ -117,17 +141,10 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges, stati
             {isEditChallengeOpen && (
                 <ChallengeForm
                     mode="edit"
-                    initialData={challenge} // Langsung kirim challenge dari prop
+                    initialData={challenge}
                     customId={challenge.customId}
-                    onClose={() => setIsEditChallengeOpen(false)}
-                    onChallengeCreated={async () => {
-                        try {
-                            await reloadChallenges();
-                            setIsEditChallengeOpen(false);
-                        } catch (error) {
-                            console.error('Error reloading:', error);
-                        }
-                    }}
+                    onClose={handleCloseEdit}
+                    onChallengeCreated={handleChallengeUpdated}
                 />
             )}
         </>

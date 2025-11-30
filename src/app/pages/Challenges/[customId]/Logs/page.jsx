@@ -1,5 +1,6 @@
 'use client'
 
+import React from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Loading from "@/app/components/ui/loading";
@@ -11,7 +12,7 @@ import LogCard from "@/app/components/ui/Log";
 import Link from "next/link";
 
 
-export default function Logs() {
+function Logs() {
     const { customId } = useParams();
     const [loading, setLoading] = useState(true);
     const [logs, setLogs] = useState(null);
@@ -125,3 +126,5 @@ export default function Logs() {
         </ProtectedRoute>
     );
 }
+
+export default React.memo(Logs);

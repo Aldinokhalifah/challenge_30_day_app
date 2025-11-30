@@ -1,7 +1,7 @@
 'use client';
 
 import { MoreVertical, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
@@ -33,8 +33,8 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
 
     const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
 
-    const handleDelete = async (customId) => {
-        const confirmation = window.confirm("Are you sure wanto to delete this challenge?");
+    const handleDelete = useCallback(async (customId) => {
+        const confirmation = window.confirm("Are you sure you want to delete this challenge?");
 
         if(confirmation) {
             const token = localStorage.getItem('token');
@@ -56,16 +56,14 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                 const data = await response.json();
                 console.log("Challenge deleted:", data.message);
                 
-                if (response.ok) {
-                    if (onDeleted) onDeleted(); // reload data di parent
-                }
+                if (onDeleted) onDeleted();
             } catch (error) {
                 console.error(error.message);
             }
         }
-    }
+    }, [onDeleted]); 
 
-    const handleTogglePublic = async (customId, newStatus) => {
+    const handleTogglePublic = useCallback(async (customId, newStatus) => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
@@ -90,7 +88,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
         } catch (error) {
             console.error(error.message);
         }
-    }
+    }, [onDeleted]);
 
     return (
         <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>

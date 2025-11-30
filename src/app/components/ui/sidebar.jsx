@@ -18,7 +18,11 @@ export default function Sidebar({ isOpen, onClose }) {
   const router = useRouter();
 
   const logout = useCallback(() => {
-    localStorage.removeItem('token');
+    Promise.all([
+      localStorage.removeItem('token'),
+      localStorage.removeItem('userData'),
+      localStorage.removeItem('lastActivity')
+    ]);
     router.push('/Login');
   }, [router]);
 

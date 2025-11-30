@@ -13,31 +13,52 @@ export async function GET(req) {
             )
         }
 
-        // Ambil semua challenge user (bisa filter pakai userId kalau sudah ada auth)
         const challenges = await Challenge.find({userId: userId});
 
         if (!challenges.length) {
-        return NextResponse.json({ message: "Belum ada challenge" }, { status: 200 });
+            return NextResponse.json({ 
+                message: "Belum ada challenge",
+                totalChallenges: 0,
+                completedChallenges: 0,
+                activeChallenges: 0,
+                overallProgress: 0
+            }, { status: 200 });
         }
 
-        // Hitung stats gabungan
-        const totalChallenges = challenges.length;
-        const completedChallenges = challenges.filter(c => c.progress >= 100).length;
+        const challengesWithProgress = challenges.map(challenge => {
+            const completedDays = challenge.logs.filter(log => log.status === 'completed').length;
+            const progress = Math.round((completedDays / 30) * 100); // Convert ke persentase
+            
+            return {
+                progress
+            };
+        });
+
+        console.log("📊 Challenges progress:", challengesWithProgress);
+
+        // Hitung stats
+        const totalChallenges = challengesWithProgress.length;
+        const completedChallenges = challengesWithProgress.filter(c => c.progress >= 100).length;
         const activeChallenges = totalChallenges - completedChallenges;
+        
         let overallProgress = 0;
         if (totalChallenges > 0) {
-            const sumProgress = challenges.reduce((sum, c) => sum + (c.progress || 0), 0);
+            const sumProgress = challengesWithProgress.reduce((sum, c) => sum + c.progress, 0);
             overallProgress = Math.round(sumProgress / totalChallenges);
-            // Pastikan progress tidak lebih dari 100
             overallProgress = Math.min(overallProgress, 100);
+            
+            console.log("📊 Calculation:", {
+                sumProgress,
+                totalChallenges,
+                overallProgress
+            });
         }
 
-
         return NextResponse.json({
-        totalChallenges,
-        completedChallenges,
-        activeChallenges,
-        overallProgress,
+            totalChallenges,
+            completedChallenges,
+            activeChallenges,
+            overallProgress,
         });
     } catch (error) {
         console.error("❌ Error overview stats:", error.message);

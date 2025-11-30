@@ -33,77 +33,77 @@ export default function LogCard({ log }) {
         setLogs(data.logs);
     };
 
-    const handleEditLog = (log) => {
+        const handleEditLog = useCallback((log) => {
         setEditingLog(log.day);
         setNoteInput(log.note || "");
         setSelectedStatus(log.status);
-    };
+    }, []); 
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = useCallback(() => {
         setEditingLog(null);
         setNoteInput("");
         setSelectedStatus("");
-    };
+    }, []); 
 
-    const handleSaveLog = async (days) => {
+    const handleSaveLog = useCallback(async (days) => {
         const token = localStorage.getItem("token");
         if (!token) {
-        setError("Token not found");
-        return;
+            setError("Token not found");
+            return;
         }
 
         if (!noteInput.trim()) {
-        alert("Please add a note before saving");
-        return;
+            alert("Please add a note before saving");
+            return;
         }
 
         setUpdatingLog(days);
 
         try {
-        const res = await fetch(`/api/challenge/${customId}/logs/${days}`, {
-            method: "PUT",
-            headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-            status: selectedStatus,
-            note: noteInput,
-            days: days,
-            }),
-        });
+            const res = await fetch(`/api/challenge/${customId}/logs/${days}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    status: selectedStatus,
+                    note: noteInput,
+                    days: days,
+                }),
+            });
 
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Failed to update log");
-        }
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to update log");
+            }
 
-        const data = await res.json();
+            const data = await res.json();
 
-        // Update logs state with the new log data
-        const updatedLogs = logs.map((log) =>
-            log.days === days ? data.log : log
-        );
-        setLogs(updatedLogs);
-        await reloadChallenges();
+            // Update logs state with the new log data
+            const updatedLogs = logs.map((log) =>
+                log.days === days ? data.log : log
+            );
+            setLogs(updatedLogs);
+            await reloadChallenges();
 
-        // Reset editing state
-        setEditingLog(null);
-        setNoteInput("");
-        setSelectedStatus("");
+            // Reset editing state
+            setEditingLog(null);
+            setNoteInput("");
+            setSelectedStatus("");
 
-        // Show confirmation
-        if (selectedStatus === "completed") {
-            setShowConfirmation(days);
-            setTimeout(() => setShowConfirmation(null), 3000);
-        }
+            // Show confirmation
+            if (selectedStatus === "completed") {
+                setShowConfirmation(days);
+                setTimeout(() => setShowConfirmation(null), 3000);
+            }
         } catch (err) {
-        console.error("Error updating log:", err);
-        alert(err.message);
+            console.error("Error updating log:", err);
+            alert(err.message);
         } finally {
-        setUpdatingLog(null);
+            setUpdatingLog(null);
         }
-    };
+    }, [customId, noteInput, selectedStatus, logs, reloadChallenges]);
 
     const getStatusIcon = (status) => {
         switch (status) {

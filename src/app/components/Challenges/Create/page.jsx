@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Loading from "../../ui/loading";
 import { Plus } from "lucide-react";
 
@@ -24,40 +24,40 @@ export default function ChallengeForm({
         }
     }, [mode, initialData]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
+            setLoading(true);
+            const token = localStorage.getItem("token");
 
-        const url =
-            mode === "create"
-            ? "/api/challenge/create"
-            : `/api/challenge/${customId}/edit`;
-        const method = mode === "create" ? "POST" : "PUT";
+            const url =
+                mode === "create"
+                    ? "/api/challenge/create"
+                    : `/api/challenge/${customId}/edit`;
+            const method = mode === "create" ? "POST" : "PUT";
 
-        const response = await fetch(url, {
-            method,
-            headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ title, description, startDate }),
-        });
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ title, description, startDate }),
+            });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        if (onChallengeCreated) onChallengeCreated();
-        onClose();
+            if (onChallengeCreated) onChallengeCreated();
+            onClose();
         } catch (error) {
-        console.error("Error submitting challenge:", error);
-        setError(error.message);
+            console.error("Error submitting challenge:", error);
+            setError(error.message);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
-    };
+    }, [mode, customId, title, description, startDate, onChallengeCreated, onClose]);
 
     return (
         <>

@@ -1,8 +1,11 @@
 import { TrendingUp } from "lucide-react";
+import { useMemo } from "react";
 
 export default function ProgressOverview({ challenge, statistic }) {
     const stats = statistic || {
-        completedDays : challenge.logs.filter(l => l.status === "completed").length,
+        completedDays : useMemo(() => {
+            return challenge.logs.filter(l => l.status === "completed").length
+        }, [challenge.logs]),
         progressPercentage : (completedDays / 30) * 100
     };
         

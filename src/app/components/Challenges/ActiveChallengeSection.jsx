@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ChallengeCard from "../ui/Card";
 import StartNewChallenge from "./StartNewChallenge";
 import ChallengeForm from "./Create/page";
@@ -16,10 +16,12 @@ export function ActiveChallengesSection({  challengeStats, reloadChallenges }) {
 
         // Search filter
         if (searchQuery.trim()) {
-            filtered = filtered.filter(challenge => 
-                challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                challenge.description.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            filtered = useMemo(() => {
+                return filtered.filter(challenge => 
+                    challenge.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    challenge.description.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+            }, [challenge.title, challenge.description, searchQuery]);
         }
 
         // Sort filter
