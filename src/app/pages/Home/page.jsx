@@ -1,7 +1,6 @@
 'use client';
 
 import React from "react";
-import ProtectedRoute from "../../components/protectedRoute";
 import Sidebar from "@/app/components/ui/sidebar";
 import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
@@ -20,6 +19,24 @@ function HomePage() {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    // Track user activity untuk inaktivitas check
+    useEffect(() => {
+        const handleActivity = () => {
+            document.cookie = `lastActivity=${Date.now()}; path=/; max-age=86400; SameSite=Lax`;
+        };
+
+        handleActivity(); // Set initial activity
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
+        window.addEventListener("click", handleActivity);
+
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
+            window.removeEventListener("click", handleActivity);
+        };
+    }, []);
+
     useEffect(() => {
         const userData = localStorage.getItem('userData');
 
@@ -34,12 +51,10 @@ function HomePage() {
 
     // Fungsi fetch data challenge
     const fetchChallengeStats = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
         try {
             setLoading(true);
             const response = await fetch('/api/challenge/read', {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include' 
             });
             if (!response.ok) throw new Error('Failed to fetch challenges');
             const data = await response.json();
@@ -52,9 +67,8 @@ function HomePage() {
     };
 
     const fetchOverviewStats = async () => {
-        const token = localStorage.getItem('token');
         const res = await fetch("/api/challenge/statistic", {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include' 
         });
         const data = await res.json();
         setOverviewStats(data);
@@ -91,12 +105,7 @@ function HomePage() {
     };
 
     return (
-        <ProtectedRoute>
                 <AnimatedGradientBg>
-                    {loading && (
-                        <Loading />
-                    )}
-
                     {isRefreshing && (
                         <Loading 
                             message="Updating your progress..." 
@@ -132,7 +141,6 @@ function HomePage() {
                         </div>
                     </div>
                 </AnimatedGradientBg>
-        </ProtectedRoute>
     );
 }
 

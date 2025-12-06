@@ -36,12 +36,9 @@ export default function Login() {
             throw new Error(data.message || 'Login failed');
         }
         
-        // Simpan data secara bersamaan
-        Promise.all([
-            localStorage.setItem("token", data.token),
-            localStorage.setItem('userData', JSON.stringify(data.userData)),
-            localStorage.setItem("lastActivity", Date.now().toString())
-        ]);
+        // Simpan data
+        localStorage.setItem('userData', JSON.stringify(data.userData));
+        document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
         
         router.push('/');
     } catch (error) {

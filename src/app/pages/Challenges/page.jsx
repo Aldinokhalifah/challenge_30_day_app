@@ -2,7 +2,6 @@
 
 import React from "react";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
-import ProtectedRoute from "@/app/components/protectedRoute";
 import { useEffect, useState } from "react";
 import { Menu } from 'lucide-react';
 import Sidebar from "@/app/components/ui/sidebar";
@@ -15,21 +14,30 @@ function Challenges() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
+    // Track user activity untuk inaktivitas check
+    useEffect(() => {
+        const handleActivity = () => {
+            document.cookie = `lastActivity=${Date.now()}; path=/; max-age=86400; SameSite=Lax`;
+        };
+
+        handleActivity();
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
+        window.addEventListener("click", handleActivity);
+
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
+            window.removeEventListener("click", handleActivity);
+        };
+    }, []);
+    
     
     const fetchChallengeStats = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.error('Token not found');
-            return;
-        }
-
         try {
             setLoading(true);
             const response = await fetch('/api/challenge/read', {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             });
     
             if (!response.ok) {
@@ -61,7 +69,6 @@ function Challenges() {
         fetchChallengeStats();
     }, []);
     return(
-        <ProtectedRoute>
             <AnimatedGradientBg>
 
                 {loading && (
@@ -95,7 +102,6 @@ function Challenges() {
                         </div>
                 </div>
             </AnimatedGradientBg>
-        </ProtectedRoute>
     );
 }
 

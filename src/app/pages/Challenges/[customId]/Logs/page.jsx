@@ -4,7 +4,6 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Loading from "@/app/components/ui/loading";
-import ProtectedRoute from "@/app/components/protectedRoute";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Sidebar from "@/app/components/ui/sidebar";
 import { ArrowRightToLine, Menu } from "lucide-react";
@@ -18,21 +17,29 @@ function Logs() {
     const [logs, setLogs] = useState(null);
     const [error, setError] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    
+    // Track user activity untuk inaktivitas check
+    useEffect(() => {
+        const handleActivity = () => {
+            document.cookie = `lastActivity=${Date.now()}; path=/; max-age=86400; SameSite=Lax`;
+        };
+
+        handleActivity();
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
+        window.addEventListener("click", handleActivity);
+
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
+            window.removeEventListener("click", handleActivity);
+        };
+    }, []);
 
     const fetchLogs = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setError('Token not found');
-            setLoading(false);
-            return;
-        }
-
         try {
             const res = await fetch(`/api/challenge/${customId}/logs`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             }); 
 
             if (!res.ok) throw new Error('Failed to fetch challenge');
@@ -54,7 +61,6 @@ function Logs() {
     if (error) return <div className="flex items-center justify-center min-h-screen text-red-400">Error: {error}</div>;
 
     return (
-        <ProtectedRoute>
             <AnimatedGradientBg>
                 <div className="min-h-screen">
                     {/* Sidebar */}
@@ -74,7 +80,7 @@ function Logs() {
                             <h1 className="ml-3 text-lg font-semibold text-white">Logs Progress</h1>
                             <Link
                                 href={`/pages/Challenges/${customId}`}
-                                className="md:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center"
+                                className="lg:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center"
                             >
                                 <p className="transition-all">Back</p>
                                 <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
@@ -123,7 +129,6 @@ function Logs() {
                 </div>
                 
             </AnimatedGradientBg>
-        </ProtectedRoute>
     );
 }
 

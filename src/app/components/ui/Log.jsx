@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
     Clock,
     XCircle,
@@ -46,11 +46,6 @@ export default function LogCard({ log }) {
     }, []); 
 
     const handleSaveLog = useCallback(async (days) => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setError("Token not found");
-            return;
-        }
 
         if (!noteInput.trim()) {
             alert("Please add a note before saving");
@@ -62,10 +57,7 @@ export default function LogCard({ log }) {
         try {
             const res = await fetch(`/api/challenge/${customId}/logs/${days}`, {
                 method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                credentials: 'include',
                 body: JSON.stringify({
                     status: selectedStatus,
                     note: noteInput,

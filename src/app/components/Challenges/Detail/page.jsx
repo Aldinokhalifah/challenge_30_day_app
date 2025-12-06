@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnimatedGradientBg from "../../ui/animatedBgGradient";
-import ProtectedRoute from "../../protectedRoute";
 import Sidebar from "../../ui/sidebar";
 import { Menu } from "lucide-react";
 import HeroChallengeDetail from "./Hero";
@@ -9,10 +8,27 @@ import DailyLogs from "./DailyLogs";
 
 export default function ChallengeDetail({ challenge, reloadChallenges, statistic }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    
+    // Track user activity untuk inaktivitas check
+    useEffect(() => {
+        const handleActivity = () => {
+            document.cookie = `lastActivity=${Date.now()}; path=/; max-age=86400; SameSite=Lax`;
+        };
+
+        handleActivity();
+        window.addEventListener("mousemove", handleActivity);
+        window.addEventListener("keydown", handleActivity);
+        window.addEventListener("click", handleActivity);
+
+        return () => {
+            window.removeEventListener("mousemove", handleActivity);
+            window.removeEventListener("keydown", handleActivity);
+            window.removeEventListener("click", handleActivity);
+        };
+    }, []);
 
 
     return (
-        <ProtectedRoute>
             <AnimatedGradientBg>
                 <div className="min-h-screen">
                     {/* Sidebar */}
@@ -47,6 +63,5 @@ export default function ChallengeDetail({ challenge, reloadChallenges, statistic
                     </div>
                 </div>
             </AnimatedGradientBg>
-        </ProtectedRoute>
     );
 }

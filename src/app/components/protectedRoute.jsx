@@ -1,4 +1,3 @@
-// components/ProtectedRoute.jsx
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,11 +8,15 @@ export default function ProtectedRoute({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Cek token dan inaktivitas saat komponen mount
-        const token = localStorage.getItem("token");
-        if (!token || checkInactivity()) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("lastActivity");
+        // Cek userData (token sudah dicek di middleware)
+        // Component ini untuk layer tambahan dan cek inaktivitas
+        const userData = localStorage.getItem("userData");
+        
+        if (!userData || checkInactivity()) {
+            Promise.all([
+                localStorage.removeItem("lastActivity"),
+                localStorage.removeItem("userData")
+            ]);
             router.replace("/Login");
             return;
         }

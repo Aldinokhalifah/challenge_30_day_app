@@ -75,7 +75,7 @@ export default function OverviewStats({ overviewStats }) {
             bgGradient: "from-orange-500/10 to-amber-600/5"
         },
         { 
-            label: "Progress", 
+            label: "Overall Progress", 
             value: `${animatedValues.overallProgress || 0} %`,
             actualValue: overviewStats.overallProgress,
             icon: "📊",
@@ -144,7 +144,7 @@ export default function OverviewStats({ overviewStats }) {
                                 <div className={`text-4xl lg:text-5xl font-black bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent transition-all duration-500 group-hover:scale-110 transform-gpu`}>
                                     <AnimatedNumber 
                                         value={typeof item.actualValue === 'number' ? item.actualValue : parseInt(item.actualValue)} 
-                                        suffix={item.label === 'Progress' ? '%' : ''}
+                                        suffix={item.label === 'Overall Progress' ? '%' : ''}
                                     />
                                 </div>
                                 

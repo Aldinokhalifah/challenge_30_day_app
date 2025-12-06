@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Menu} from 'lucide-react';
-import ProtectedRoute from '@/app/components/protectedRoute';
 import AnimatedGradientBg from '@/app/components/ui/animatedBgGradient';
 import Sidebar from '@/app/components/ui/sidebar';
 import ProfilePage from '@/app/components/Profile/page';
@@ -12,7 +11,6 @@ export default function Profile() {
 
 
     return (
-        <ProtectedRoute>
             <AnimatedGradientBg>
                 <div className="min-h-screen text-white">
                     {/* Sidebar */}
@@ -28,7 +26,7 @@ export default function Profile() {
                             >
                                 <Menu className="h-6 w-6" />
                             </button>
-                            <h1 className="ml-3 text-lg font-semibold">Challenge 30 Days App</h1>
+                            <h1 className="ml-3 text-lg font-semibold">Profile Page</h1>
                         </header>
 
                         {/* Content */}
@@ -39,6 +37,5 @@ export default function Profile() {
                     </div>
                 </div>
             </AnimatedGradientBg>
-        </ProtectedRoute>
     );
 }

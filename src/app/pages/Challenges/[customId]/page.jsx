@@ -15,26 +15,14 @@ function ChallengeDetailPage() {
 
     useEffect(() => {
         async function fetchChallenge() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError('Token not found');
-                setLoading(false);
-                return;
-            }
 
             try {
                 const [challengeRes, statsRes] = await Promise.all([
                     fetch(`/api/challenge/${customId}`, {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
+                        credentials: 'include'
                     }),
                     fetch(`/api/challenge/${customId}/statistic`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-type': 'application/json'
-                        }
+                        credentials: 'include'
                     })
                 ]);
 
@@ -66,10 +54,7 @@ function ChallengeDetailPage() {
         try {
             setLoading(true);
             const res = await fetch(`/api/challenge/${customId}`, {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             });
             
             if (!res.ok) throw new Error('Failed to fetch challenge');

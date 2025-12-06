@@ -8,9 +8,8 @@ export default function StartNewChallenge() {
         setIsCreateChallengeOpen(false);
     }, []);
 
-    const handleChallengeCreated = useCallback((newChallenge) => {
-        setFilteredChallenges((prev) => [...prev, newChallenge]); 
-        setIsCreateChallengeOpen(false);
+    const handleChallengeCreated = useCallback(() => {
+        setIsCreateChallengeOpen(true);
     }, []);
 
     return(

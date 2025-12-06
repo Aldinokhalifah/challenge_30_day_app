@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LogOut, Home, CalendarCheck2, User2, X, LogIn } from 'lucide-react';
 import Image from 'next/image';
 
@@ -13,17 +13,45 @@ const nav = [
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
-  const token = localStorage.getItem('token');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
-  const logout = useCallback(() => {
-    Promise.all([
-      localStorage.removeItem('token'),
-      localStorage.removeItem('userData'),
-      localStorage.removeItem('lastActivity')
-    ]);
-    router.push('/Login');
+  // Cek apakah user sudah login dari userData di localStorage
+  useEffect(() => {
+    const userData = localStorage.getItem('userData');
+    setIsLoggedIn(!!userData);
+
+    // Listen untuk perubahan localStorage (dari tab lain atau logout)
+    const handleStorageChange = () => {
+      const userData = localStorage.getItem('userData');
+      setIsLoggedIn(!!userData);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      // Call logout API untuk hapus cookies di server
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      // Hapus dari localStorage
+      localStorage.removeItem('userData');
+      localStorage.removeItem('lastActivity');
+      
+      // Update state
+      setIsLoggedIn(false);
+      
+      // Redirect ke login
+      router.push('/Login');
+    }
   }, [router]);
 
   return (
@@ -74,7 +102,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Main Content - Flex grow untuk push footer ke bawah */}
         <div className="flex-1 flex flex-col">
-          {token ? (
+          {isLoggedIn ? (
             <>
               {/* Navigation List */}
               <nav className="px-2 py-6">
@@ -132,7 +160,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Footer - Bottom Actions */}
         <div className="border-t border-white/10 p-4 space-y-3">
-          {token ? (
+          {isLoggedIn ? (
             <>
               <button
                 onClick={() => {

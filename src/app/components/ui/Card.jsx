@@ -41,10 +41,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
             try {
                 const response = await fetch(`/api/challenge/${customId}/delete`, {
                     method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
+                    credentials: 'include'
                 });
 
                 if (!response.ok) {
@@ -68,10 +65,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
                 method: 'PUT',
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
+                credentials: 'include',
                 body: JSON.stringify({ isPublic: newStatus })
             });
 
