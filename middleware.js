@@ -4,49 +4,48 @@ export function middleware(req) {
     const token = req.cookies.get("token")?.value;
     const { pathname } = req.nextUrl;
 
-    // Routes yang memerlukan autentikasi
-    const protectedRoutes = ['/', '/pages/Challenges', '/pages/Home', '/pages/Profile'];
-    const isProtectedRoute = protectedRoutes.some(route => 
+    // Halaman publik yang tidak butuh autentikasi
+    const publicRoutes = ['/Login', '/Register', '/api/auth/login', '/api/auth/register', '/api/public'];
+
+    const isPublicRoute = publicRoutes.some(route =>
         pathname === route || pathname.startsWith(route + '/')
     );
 
-    // Jika akses protected route tanpa token, redirect ke login
-    if (isProtectedRoute && !token) {
+    // Boleh lewat kalau public
+    if (isPublicRoute) {
+        return NextResponse.next();
+    }
+
+    // Halaman lain wajib token
+    if (!token) {
+        console.log(`[Middleware] No token - redirecting to Login from ${pathname}`);
         return NextResponse.redirect(new URL("/Login", req.url));
     }
 
-    // Jika ada token, cek inaktivitas (30 menit)
-    if (token && isProtectedRoute) {
-        const lastActivityCookie = req.cookies.get("lastActivity")?.value;
-        const now = Date.now();
-        const maxInactivity = 30 * 60 * 1000; // 30 menit
+    // Update inactivity cookie 30 menit
+    const now = Date.now();
+    const lastActivity = req.cookies.get("lastActivity")?.value;
+    const maxInactivity = 30 * 60 * 1000;
 
-        if (lastActivityCookie) {
-            const inactiveTime = now - parseInt(lastActivityCookie);
-            if (inactiveTime > maxInactivity) {
-                // Token expired due to inactivity
-                const response = NextResponse.redirect(new URL("/Login", req.url));
-                response.cookies.delete("token");
-                response.cookies.delete("lastActivity");
-                return response;
-            }
-        }
-
-        // Update lastActivity cookie
-        const response = NextResponse.next();
-        response.cookies.set("lastActivity", now.toString(), {
-            httpOnly: false, // Perlu false agar bisa diakses dari client-side juga
-            secure: true,
-            sameSite: "strict",
-            path: "/",
-            maxAge: 60 * 60 * 24 // 1 hari
-        });
+    if (lastActivity && now - Number(lastActivity) > maxInactivity) {
+        const response = NextResponse.redirect(new URL("/Login", req.url));
+        response.cookies.delete("token");
+        response.cookies.delete("lastActivity");
         return response;
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.cookies.set("lastActivity", String(now), {
+        httpOnly: false,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24
+    });
+
+    return response;
 }
 
 export const config = {
-  matcher: ['/', '/pages/:path*'], // Melindungi root dan semua route di /pages
+    matcher: ['/((?!api|_next|favicon.ico|public).*)'],
 };

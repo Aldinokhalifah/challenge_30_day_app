@@ -22,10 +22,7 @@ export default function LogCard({ log }) {
     const reloadChallenges = async () => {
         const token = localStorage.getItem("token");
         const res = await fetch(`/api/challenge/${customId}/logs`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
+            credentials: 'include',
         });
 
         if (!res.ok) throw new Error("Failed to fetch challenge");
@@ -192,6 +189,7 @@ export default function LogCard({ log }) {
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
+                        disabled={log.status === 'completed' || log.status === 'missed'}
                         className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                     >
                         <option value="completed">✓ Completed</option>

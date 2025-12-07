@@ -45,30 +45,24 @@ function HomePage() {
                 setUserData(JSON.parse(userData));
             } catch (error) {
                 console.error('Error parsing userData:', error);
+                setError(error.message);
             }
         }
     }, []);
 
     // Fungsi fetch data challenge
     const fetchChallengeStats = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch('/api/challenge/read', {
-                credentials: 'include' 
-            });
-            if (!response.ok) throw new Error('Failed to fetch challenges');
-            const data = await response.json();
-            setChallengeStats(data.challenges);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+        const res = await fetch('/api/challenge/read', {
+            credentials: 'include'
+        });
+        const data = await res.json();
+        setChallengeStats(data.challenges);
+        setLoading(false);
     };
 
     const fetchOverviewStats = async () => {
         const res = await fetch("/api/challenge/statistic", {
-            credentials: 'include' 
+            credentials: 'include'
         });
         const data = await res.json();
         setOverviewStats(data);
@@ -77,6 +71,7 @@ function HomePage() {
     // Initial load
     useEffect(() => {
         const loadInitialData = async () => {
+            setLoading(true);
             setIsInitialLoading(true);
             try {
                 await Promise.all([
