@@ -30,7 +30,7 @@ export default function LogCard({ log }) {
         setLogs(data.logs);
     };
 
-        const handleEditLog = useCallback((log) => {
+    const handleEditLog = useCallback((log) => {
         setEditingLog(log.day);
         setNoteInput(log.note || "");
         setSelectedStatus(log.status);
@@ -87,8 +87,10 @@ export default function LogCard({ log }) {
                 setTimeout(() => setShowConfirmation(null), 3000);
             }
         } catch (err) {
-            console.error("Error updating log:", err);
+            console.error(err);
             alert(err.message);
+            setSelectedStatus("pending");
+            setNoteInput("");
         } finally {
             setUpdatingLog(null);
         }
@@ -250,7 +252,7 @@ export default function LogCard({ log }) {
                         <FileText className="w-3 h-3" />
                         Note
                         </p>
-                        <p className="text-gray-300 text-sm leading-relaxed">
+                        <p className="text-gray-300 text-sm leading-relaxed h-10 overflow-y-auto scroll-">
                         {log.note}
                         </p>
                     </div>

@@ -45,6 +45,8 @@ function Logs() {
             if (!res.ok) throw new Error('Failed to fetch challenge');
                 const data = await res.json();
                 setLogs(data.logs);
+                console.log("canFillToday: " + data.canFillToday);
+                console.log("filledDayToday: " + data.filledDayToday);
         } catch (err) {
             console.error("Error fetching challenge:", err);
             setError(err.message);

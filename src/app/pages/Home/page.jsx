@@ -8,6 +8,7 @@ import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
 import Loading from "@/app/components/ui/loading";
+import { useRouter } from 'next/navigation';
 
 function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,6 +19,7 @@ function HomePage() {
     const [overviewStats, setOverviewStats] = useState(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const router = useRouter();
 
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -70,6 +72,7 @@ function HomePage() {
 
     // Initial load
     useEffect(() => {
+        const userData = localStorage.getItem('userData');
         const loadInitialData = async () => {
             setLoading(true);
             setIsInitialLoading(true);
@@ -83,8 +86,14 @@ function HomePage() {
             }
         };
 
-        loadInitialData();
-    }, []);
+        if(!userData) {
+            console.log('[Home] No userData detected - redirecting to login');
+            router.replace('/Login');
+        } else {
+            loadInitialData();
+        }
+
+    }, [router]);
 
      // Callback untuk reload setelah create/delete
     const reloadAll = async () => {

@@ -11,6 +11,7 @@ export default function Login() {
     const [message, setMessage] = useState('');
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,7 +28,11 @@ export default function Login() {
                 'Content-Type': 'application/json',
                 'Cache-Control': 'no-cache' // Tambahkan ini
             },
-            body: JSON.stringify(form)
+            body: JSON.stringify({
+                email: form.email,
+                password: form.password,
+                timezone
+            })
         });
         
         const data = await response.json();
@@ -55,7 +60,7 @@ export default function Login() {
     return(
         <>
             <AnimatedGradientBg>
-                <div className="relative py-20 sm:max-w-xl sm:mx-auto">
+                <div className="relative py-20 sm:max-w-xl sm:mx-auto ">
                     <div
                         className="relative px-4 py-10 backdrop-blur-md bg-white/10 border border-white/20 mx-8 md:mx-0 shadow rounded-3xl sm:p-10"
                     >

@@ -8,7 +8,7 @@ export async function POST(req) {
     const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
-        const { email, password } = await req.json();
+        const { email, password, timezone } = await req.json();
 
         const findUser = await User.findOne({email});
         if(!findUser) {
@@ -26,6 +26,11 @@ export async function POST(req) {
         );
         }
 
+        if(timezone && findUser.timezone !== timezone) {
+            findUser.timezone = timezone;
+            await findUser.save();
+        }
+
         const token = jwt.sign({ id: findUser._id}, JWT_SECRET, { expiresIn: '1d'});
 
         const res = NextResponse.json({
@@ -34,6 +39,7 @@ export async function POST(req) {
             id: findUser.customId,
             name: findUser.name,
             email: findUser.email,
+            timezone: findUser.timezone
         }
         });
 

@@ -7,12 +7,14 @@ import { Menu } from 'lucide-react';
 import Sidebar from "@/app/components/ui/sidebar";
 import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChallengeSection";
 import Loading from "@/app/components/ui/loading";
+import { useRouter } from "next/navigation";
 
 function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [challengeStats, setChallengeStats] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
     
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -66,7 +68,14 @@ function Challenges() {
     };
 
     useEffect(() => {
-        fetchChallengeStats();
+        const userData = localStorage.getItem('userData');
+
+        if(!userData) {
+            console.log('[Challenges] No userData detected - redirecting to login');
+            router.replace('/Login');
+        } else {
+            fetchChallengeStats();
+        }
     }, []);
     return(
             <AnimatedGradientBg>

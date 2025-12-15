@@ -4,7 +4,7 @@ const logsSchema = new mongoose.Schema({
     day: Number,
     note: String,
     status: String,
-    date: Date,
+    filledAt: Date,
 });
 
 

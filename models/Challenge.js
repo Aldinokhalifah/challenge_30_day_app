@@ -13,6 +13,13 @@ const challengeSchema = new mongoose.Schema({
     createdAt: Date,
     logs: Array,
     isPublic: Boolean,
+    lastFilled: {
+        day: { type: Number, default: null },
+        dateISO: { type: String, default: null } 
+    }
 });
+
+// Tambahkan compound index untuk query optimization
+challengeSchema.index({ userId: 1, customId: 1 });
 
 export default mongoose.models.Challenge || mongoose.model('Challenge', challengeSchema);

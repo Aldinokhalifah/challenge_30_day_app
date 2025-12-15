@@ -55,6 +55,7 @@ export default function ProfilePage() {
     };
 
     useEffect(() => {
+        const userData = localStorage.getItem('userData');
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -70,7 +71,13 @@ export default function ProfilePage() {
             }
         };
 
-        fetchData();
+        if(!userData) {
+            console.log('[Profile] No userData detected - redirecting to login');
+            router.replace('/Login');
+        } else {
+            fetchData();
+        }
+
     }, []);
 
     useEffect(() => {

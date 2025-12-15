@@ -16,6 +16,11 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true,
     },
+    timezone: {
+        type: String,
+        default: 'UTC'
+    }
+
 }, { timestamps: true });
 
 // hash paswword sebelum disimpan
