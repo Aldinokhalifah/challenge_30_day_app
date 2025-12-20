@@ -26,23 +26,30 @@ export async function GET(req, {params}) {
         )
     }
 
-    // Ambil timezone user
     const user = await User.findById(userId);
     const userTimezone = user?.timezone || "UTC";
 
-    // Get tanggal hari ini di timezone user
     const now = new Date();
     const zonedNow = toZonedTime(now, userTimezone);
     const todayKey = format(zonedNow, "yyyy-MM-dd");
 
-    // Cek apakah sudah isi log hari ini
-    let canFillToday = true;
-    let filledDayToday = challenge.lastFilled.day || null;
-
+    let canFillToday, filledDayToday;
+    
     if(challenge.lastFilled?.dateISO === todayKey) {
         canFillToday = false;
         filledDayToday = challenge.lastFilled.day;
+    } else {
+        canFillToday = true;
+        filledDayToday = null;
     }
+
+    // Hitung next day yang harus diisi
+    const filledLogs = challenge.logs
+        .filter(log => log.status !== 'pending')
+        .sort((a, b) => a.day - b.day);
+    
+    const lastFilledLog = filledLogs[filledLogs.length - 1];
+    const nextDayToFill = lastFilledLog ? lastFilledLog.day + 1 : 1;
 
     const logs = challenge.logs.map(log => ({
         day: log.day,
@@ -56,6 +63,7 @@ export async function GET(req, {params}) {
         message: 'Logs berhasil diambil',
         logs: logs,
         canFillToday: canFillToday,
-        filledDayToday: filledDayToday
+        filledDayToday: filledDayToday,
+        nextDayToFill: nextDayToFill 
     }, {status: 200})
 }

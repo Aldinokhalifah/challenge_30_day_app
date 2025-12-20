@@ -24,10 +24,7 @@ export default function Login() {
         setIsLoading(true); // Tambahkan di awal
         const response = await fetch('/api/auth/login', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache' // Tambahkan ini
-            },
+            credentials: 'include',
             body: JSON.stringify({
                 email: form.email,
                 password: form.password,

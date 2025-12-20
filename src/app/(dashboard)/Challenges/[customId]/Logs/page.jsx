@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Loading from "@/app/components/ui/loading";
@@ -36,7 +36,7 @@ function Logs() {
         };
     }, []);
 
-    const fetchLogs = async () => {
+    const fetchLogs = useCallback(async () => {
         try {
             const res = await fetch(`/api/challenge/${customId}/logs`, {
                 credentials: 'include'
@@ -53,13 +53,12 @@ function Logs() {
         } finally {
             setLoading(false);
         }
-    }
+    }, [customId])
 
     useEffect(() => {
         if (customId) fetchLogs();
     }, [customId]);
 
-    if (loading) return <Loading />
     if (error) return <div className="flex items-center justify-center min-h-screen text-red-400">Error: {error}</div>;
 
     return (
@@ -81,7 +80,7 @@ function Logs() {
                             </button>
                             <h1 className="ml-3 text-lg font-semibold text-white">Logs Progress</h1>
                             <Link
-                                href={`/pages/Challenges/${customId}`}
+                                href={`/Challenges/${customId}`}
                                 className="lg:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center"
                             >
                                 <p className="transition-all">Back</p>
@@ -90,42 +89,48 @@ function Logs() {
                         </header>
                         
                         {/* Content */}
-                        <main className="flex-1 p-4 lg:p-8 space-y-8">
-                            {/* Page Title - Desktop */}
-                            <div className="hidden lg:flex lg:justify-between">
-                                <div className="">
-                                    <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
-                                        Logs Progress
-                                    </h1>
-                                    <p className="text-gray-400">Track and update your daily challenge status</p>
-                                </div>
-                                <Link
-                                    href={`/pages/Challenges/${customId}`}
-                                        className="hidden text-gray-400 text-sm md:text-md md:flex group gap-1 items-center"
-                                    >
-                                        <p className="transition-all">Back</p>
-                                        <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
-                                </Link>
-                            </div>
+                        <main>
+                            {loading ? (
+                                <Loading />
+                            ) : (
+                                <div className="flex-1 p-4 lg:p-8 space-y-8">
+                                    {/* Page Title - Desktop */}
+                                    <div className="hidden lg:flex lg:justify-between">
+                                        <div className="">
+                                            <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text">
+                                                Logs Progress
+                                            </h1>
+                                            <p className="text-gray-400">Track and update your daily challenge status</p>
+                                        </div>
+                                        <Link
+                                            href={`/Challenges/${customId}`}
+                                                className="hidden text-gray-400 text-sm md:text-md md:flex group gap-1 items-center"
+                                            >
+                                                <p className="transition-all">Back</p>
+                                                <ArrowRightToLine className="transition-all group-hover:translate-x-1 group-hover:text-white" />
+                                        </Link>
+                                    </div>
 
-                            {/* Days Grid */}
-                            <LogCard log={logs}/>
+                                    {/* Days Grid */}
+                                    <LogCard log={logs}/>
 
-                            {/* Legend */}
-                            <div className="flex flex-wrap items-center justify-center gap-6 pt-8 border-t border-white/10">
-                                <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
-                                    <div className="w-3 h-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full shadow-lg shadow-emerald-500/50"></div>
-                                    <span className="text-gray-300 text-sm font-medium">Completed</span>
+                                    {/* Legend */}
+                                    <div className="flex flex-wrap items-center justify-center gap-6 pt-8 border-t border-white/10">
+                                        <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
+                                            <div className="w-3 h-3 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full shadow-lg shadow-emerald-500/50"></div>
+                                            <span className="text-gray-300 text-sm font-medium">Completed</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
+                                            <div className="w-3 h-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full shadow-lg shadow-amber-500/50"></div>
+                                            <span className="text-gray-300 text-sm font-medium">Pending</span>
+                                        </div>
+                                        <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
+                                            <div className="w-3 h-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-lg shadow-red-500/50"></div>
+                                            <span className="text-gray-300 text-sm font-medium">Missed</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
-                                    <div className="w-3 h-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full shadow-lg shadow-amber-500/50"></div>
-                                    <span className="text-gray-300 text-sm font-medium">Pending</span>
-                                </div>
-                                <div className="flex items-center gap-2.5 bg-slate-900/50 px-4 py-2.5 rounded-xl border border-white/10">
-                                    <div className="w-3 h-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-full shadow-lg shadow-red-500/50"></div>
-                                    <span className="text-gray-300 text-sm font-medium">Missed</span>
-                                </div>
-                            </div>
+                            )}
                         </main>
                     </div>
                 </div>

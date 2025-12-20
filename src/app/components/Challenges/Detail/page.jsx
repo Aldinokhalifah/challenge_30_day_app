@@ -5,8 +5,9 @@ import { Menu } from "lucide-react";
 import HeroChallengeDetail from "./Hero";
 import ProgressOverview from "./ProgresOverview";
 import DailyLogs from "./DailyLogs";
+import Loading from "../../ui/loading";
 
-export default function ChallengeDetail({ challenge, reloadChallenges, statistic }) {
+export default function ChallengeDetail({ challenge, reloadChallenges, statistic, loading }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     
     // Track user activity untuk inaktivitas check
@@ -49,16 +50,21 @@ export default function ChallengeDetail({ challenge, reloadChallenges, statistic
                         </header>
                         
                         {/* Content */}
-                        <main className="flex-1 p-4 lg:p-8 space-y-8">
+                        <main>
+                            {loading ? (
+                                <Loading />
+                            ) : (
+                                <div className="flex-1 p-4 lg:p-8 space-y-8">
+                                    {/* Hero Card - Challenge Info */}
+                                    <HeroChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic}/>
 
-                            {/* Hero Card - Challenge Info */}
-                            <HeroChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic}/>
+                                    {/* Progress Section */}
+                                    <ProgressOverview challenge={challenge} statistic={statistic}/>
 
-                            {/* Progress Section */}
-                            <ProgressOverview challenge={challenge} statistic={statistic}/>
-
-                            {/* Daily Logs Grid */}
-                            <DailyLogs challenge={challenge}/>
+                                    {/* Daily Logs Grid */}
+                                    <DailyLogs challenge={challenge}/>
+                                </div>
+                            )}
                         </main>
                     </div>
                 </div>

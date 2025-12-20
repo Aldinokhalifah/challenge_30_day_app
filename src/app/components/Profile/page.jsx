@@ -26,7 +26,7 @@ export default function ProfilePage() {
         try {
             const token = localStorage.getItem('token');
             const res = await fetch("/api/challenge/statistic", {
-                headers: { 'Authorization': `Bearer ${token}` }
+                credentials: 'include'
             });
             if (!res.ok) throw new Error('Failed to fetch stats');
             const data = await res.json();
@@ -55,7 +55,6 @@ export default function ProfilePage() {
     };
 
     useEffect(() => {
-        const userData = localStorage.getItem('userData');
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -71,13 +70,7 @@ export default function ProfilePage() {
             }
         };
 
-        if(!userData) {
-            console.log('[Profile] No userData detected - redirecting to login');
-            router.replace('/Login');
-        } else {
             fetchData();
-        }
-
     }, []);
 
     useEffect(() => {
@@ -91,17 +84,13 @@ export default function ProfilePage() {
 
     const handleSaveEmail = async () => {
         try {
-            const token = localStorage.getItem('token');
             const userData = JSON.parse(localStorage.getItem('userData'));
             
             if (!userData) throw new Error('No user data found');
 
             const response = await fetch(`/api/profile/edit/${userData.id}`, {
                 method: 'PUT',
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                credentials: 'include',
                 body: JSON.stringify({ email: tempEmail })
             });
 
@@ -144,17 +133,13 @@ export default function ProfilePage() {
                 setConfirmPassword('');
             }
 
-            const token = localStorage.getItem('token');
             const userData = JSON.parse(localStorage.getItem('userData'));
             
             if (!userData) throw new Error('No user data found');
 
             const response = await fetch(`/api/profile/edit/${userData.id}`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                credentials: 'include',
                 body: JSON.stringify({password: tempPassword})
             });
 
@@ -177,17 +162,13 @@ export default function ProfilePage() {
 
     const handleDeleteAccount = async () => {
         try {
-            const token = localStorage.getItem('token');
             const userData = JSON.parse(localStorage.getItem('userData'));
             
             if (!userData) throw new Error('No user data found');
 
             const response = await fetch(`/api/profile/delete/${userData.id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
+                credentials: 'include',
                 body: JSON.stringify({password: tempPassword})
             });
 
@@ -195,7 +176,6 @@ export default function ProfilePage() {
                 const errorText = await response.text();
                 throw new Error(errorText);
             }
-            localStorage.removeItem('token');
             localStorage.removeItem('userData');
 
             const data = await response.json();

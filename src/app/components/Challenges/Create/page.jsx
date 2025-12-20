@@ -28,7 +28,6 @@ export default function ChallengeForm({
         e.preventDefault();
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
 
             const url =
                 mode === "create"
@@ -38,10 +37,7 @@ export default function ChallengeForm({
 
             const response = await fetch(url, {
                 method,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                credentials: 'include',
                 body: JSON.stringify({ title, description, startDate }),
             });
 

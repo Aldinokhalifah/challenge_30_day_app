@@ -37,7 +37,6 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
         const confirmation = window.confirm("Are you sure you want to delete this challenge?");
 
         if(confirmation) {
-            const token = localStorage.getItem('token');
             try {
                 const response = await fetch(`/api/challenge/${customId}/delete`, {
                     method: 'DELETE',
@@ -62,7 +61,6 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
 
     const handleTogglePublic = useCallback(async (customId, newStatus) => {
         try {
-            const token = localStorage.getItem('token');
             const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
                 method: 'PUT',
                 credentials: 'include',

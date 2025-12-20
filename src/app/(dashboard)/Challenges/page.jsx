@@ -58,9 +58,8 @@ function Challenges() {
 
     // Fungsi untuk fetch ulang data
     const reloadChallenges = async () => {
-        const token = localStorage.getItem('token');
         const response = await fetch('/api/challenge/read', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -68,22 +67,10 @@ function Challenges() {
     };
 
     useEffect(() => {
-        const userData = localStorage.getItem('userData');
-
-        if(!userData) {
-            console.log('[Challenges] No userData detected - redirecting to login');
-            router.replace('/Login');
-        } else {
-            fetchChallengeStats();
-        }
+        fetchChallengeStats();
     }, []);
     return(
             <AnimatedGradientBg>
-
-                {loading && (
-                    <Loading />
-                )}
-                
                 <div className="min-h-screen text-white">
                     {/* Sidebar */}
                         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -103,10 +90,14 @@ function Challenges() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                                <ActiveChallengesSection
-                                    challengeStats={challengeStats}
-                                    reloadChallenges={reloadChallenges} // kirim callback ke child
-                                />
+                                {loading ? (
+                                    <Loading />
+                                ): (
+                                    <ActiveChallengesSection
+                                        challengeStats={challengeStats}
+                                        reloadChallenges={reloadChallenges} // kirim callback ke child
+                                    />
+                                )}
                             </main>
                         </div>
                 </div>

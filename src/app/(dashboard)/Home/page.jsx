@@ -72,7 +72,6 @@ function HomePage() {
 
     // Initial load
     useEffect(() => {
-        const userData = localStorage.getItem('userData');
         const loadInitialData = async () => {
             setLoading(true);
             setIsInitialLoading(true);
@@ -85,14 +84,7 @@ function HomePage() {
                 setIsInitialLoading(false);
             }
         };
-
-        if(!userData) {
-            console.log('[Home] No userData detected - redirecting to login');
-            router.replace('/Login');
-        } else {
-            loadInitialData();
-        }
-
+        loadInitialData();
     }, [router]);
 
      // Callback untuk reload setelah create/delete
@@ -110,12 +102,7 @@ function HomePage() {
 
     return (
                 <AnimatedGradientBg>
-                    {isRefreshing && (
-                        <Loading 
-                            message="Updating your progress..." 
-                            overlay={true}
-                        />
-                    )}
+                    
                     
                     <div className="min-h-screen text-white">
                         {/* Sidebar */}
@@ -136,11 +123,19 @@ function HomePage() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                            <Hero name={userData?.name} reloadChallenge={reloadAll}/>
-
-                            <div className="flex flex-col justify-center items-center gap-4 mt-20">
-                                <OverviewStats overviewStats={overviewStats}/>
-                            </div>
+                                {isRefreshing ? (
+                                    <Loading 
+                                        message="Updating your progress..." 
+                                        overlay={true}
+                                    />
+                                ) : (
+                                    <div>
+                                        <Hero name={userData?.name} reloadChallenge={reloadAll}/>
+                                        <div className="flex flex-col justify-center items-center gap-4 mt-20">
+                                            <OverviewStats overviewStats={overviewStats}/>
+                                        </div>
+                                    </div>
+                                )}
                             </main>
                         </div>
                     </div>

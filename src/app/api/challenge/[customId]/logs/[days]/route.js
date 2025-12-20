@@ -86,8 +86,43 @@ export async function PUT(req, {params}) {
         );
     }
 
-    // 3. Jika hanya update note (tanpa ubah status) -> SELALU BOLEH
-    //    Tidak perlu validasi tambahan
+    // 3. Sequential Log Filling
+    if (isFillingNewLog) {
+        // Cari log terakhir yang sudah diisi (completed atau missed)
+        const filledLogs = challenge.logs
+            .filter(log => log.status !== 'pending')
+            .sort((a, b) => a.day - b.day);
+        
+        const lastFilledLog = filledLogs[filledLogs.length - 1];
+        
+        if (lastFilledLog) {
+            const expectedNextDay = lastFilledLog.day + 1;
+            
+            // User harus isi log secara berurutan
+            if (dayNumber !== expectedNextDay) {
+                return NextResponse.json(
+                    { 
+                        message: `You must fill logs sequentially. Please fill day ${expectedNextDay} first.`,
+                        expectedDay: expectedNextDay,
+                        attemptedDay: dayNumber
+                    },
+                    { status: 400 }
+                );
+            }
+        } else {
+            // Belum ada log yang diisi, harus mulai dari day 1
+            if (dayNumber !== 1) {
+                return NextResponse.json(
+                    { 
+                        message: `You must start from day 1.`,
+                        expectedDay: 1,
+                        attemptedDay: dayNumber
+                    },
+                    { status: 400 }
+                );
+            }
+        }
+    }
 
     // Prepare update payload
     const updatePayload = {
@@ -95,11 +130,9 @@ export async function PUT(req, {params}) {
     };
 
     // Jika status pending dan ada status baru, update status dan filledAt
-    if (logExists.status === "pending" && status) {
+    if (isFillingNewLog) {
         updatePayload["logs.$.status"] = status;
         updatePayload["logs.$.filledAt"] = zonedNow;
-        
-        // UPDATE lastFilled - INI YANG PENTING!
         updatePayload["lastFilled.day"] = dayNumber;
         updatePayload["lastFilled.dateISO"] = todayKey;
     }

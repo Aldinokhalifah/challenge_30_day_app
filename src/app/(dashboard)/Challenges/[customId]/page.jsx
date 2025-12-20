@@ -15,7 +15,6 @@ function ChallengeDetailPage() {
 
     useEffect(() => {
         async function fetchChallenge() {
-
             try {
                 const [challengeRes, statsRes] = await Promise.all([
                     fetch(`/api/challenge/${customId}`, {
@@ -48,9 +47,6 @@ function ChallengeDetailPage() {
     }, [customId]);
 
     const reloadChallenges = useCallback(async () => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
         try {
             setLoading(true);
             const res = await fetch(`/api/challenge/${customId}`, {
@@ -70,11 +66,8 @@ function ChallengeDetailPage() {
     }, [customId]);
 
 
-    if (loading) return <Loading />;
     if (error) return <div>Error: {error}</div>;
-    if (!challenge) return <div>Challenges Not Found</div>;
-    
-    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic} />;
+    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic} loading={loading} />;
 }
 
 export default React.memo(ChallengeDetailPage);
