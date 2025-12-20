@@ -37,7 +37,7 @@ export default function DailyLogs({ challenge }) {
                     {/* /* Header */}
                     <div className="flex md:justify-between flex-col md:flex-row gap-4">
                         <Link
-                            href={`/pages/Challenges/${challenge.customId}/Logs`}
+                            href={`/Challenges/${challenge.customId}/Logs`}
                             className="md:hidden text-gray-400 text-sm md:text-md flex group gap-1 items-center ml-[65%]"
                         >
                             <p className="transition-all">More Detail</p>
@@ -53,7 +53,7 @@ export default function DailyLogs({ challenge }) {
                             </div>
                         </div>
                         <Link
-                            href={`/pages/Challenges/${challenge.customId}/Logs`}
+                            href={`/Challenges/${challenge.customId}/Logs`}
                             className="hidden text-gray-400 text-sm md:text-md md:flex group gap-1 items-center"
                         >
                             <p className="group-hover:ml-1 transition-all text-pretty">More Detail</p>

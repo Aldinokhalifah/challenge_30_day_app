@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import Loading from "../../../components/ui/loading";
+import Loading from "../../components/ui/loading";
 import ChallengeDetailPublic from "@/app/components/Challenge_Public/Detail/page";
 import { useParams } from "next/navigation";
 

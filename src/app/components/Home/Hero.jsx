@@ -126,7 +126,7 @@ export default function Hero({ name, reloadChallenge }) {
                     </button>
 
                     <Link
-                        href="/pages/Challenges"
+                        href="/Challenges"
                         className="px-8 py-5 border border-white/30 backdrop-blur-xl rounded-2xl font-medium text-white/90 hover:bg-white/10 hover:border-white/50 transition-all duration-300"
                     >
                         <span className="flex items-center justify-center gap-3">

@@ -8,8 +8,8 @@ import Image from 'next/image';
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: Home },
-  { href: '/pages/Challenges', label: 'Challenges', icon: CalendarCheck2 },
-  { href: '/pages/Profile', label: 'Profile', icon: User2 },
+  { href: '/Challenges', label: 'Challenges', icon: CalendarCheck2 },
+  { href: '/Profile', label: 'Profile', icon: User2 },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

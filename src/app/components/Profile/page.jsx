@@ -209,220 +209,222 @@ export default function ProfilePage() {
 
     return (
         <>
-            {loading && (
-                <Loading />
-            )}
+            {loading && <Loading />}
 
-            <div className="min-h-screen py-12 px-4">
+            {/* Background dengan gradient subtle */}
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-12 px-4">
                 <div className="max-w-4xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                        Profile Page
-                    </h1>
-                    <p className="text-slate-600">Your informations are here</p>
+                    <div className="text-center mb-10">
+                        <h1 className="text-5xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-3">
+                            Profile
+                        </h1>
+                        <p className="text-indigo-200 text-lg">Manage your account information</p>
                     </div>
 
-                    {/* Profile Card */}
-                    <div className="bg-white/90 rounded-3xl shadow-2xl shadow-indigo-100/50 overflow-hidden">
-                    {/* Profile Header */}
-                    <div className="bg-gradient-to-br from-slate-900 via-indigo-900 to-blue-900 p-8 text-center">
-                        <div className="w-24 h-24 mx-auto rounded-full bg-white/20 backdrop-blur-sm border-4 border-white flex items-center justify-center text-white text-3xl font-bold shadow-xl">
-                        <User className="w-12 h-12" />
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mt-4">{profile.name}</h2>
-                    </div>
-
-                    {/* Profile Content */}
-                    <div className="p-8 space-y-6">
-                        {/* Total Challenge */}
-                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-100">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                                <Trophy className="w-6 h-6 text-white" />
+                    {/* Profile Card dengan glassmorphism */}
+                    <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                        {/* Profile Header */}
+                        <div className="bg-gradient-to-br from-indigo-800/80 via-purple-800/80 to-blue-900/80 p-10 text-center">
+                            <div className="w-32 h-32 mx-auto rounded-full bg-white/20 backdrop-blur-md border-4 border-white/30 flex items-center justify-center text-white text-5xl font-bold shadow-2xl">
+                                <User className="w-16 h-16" />
                             </div>
-                            <div>
-                                <p className="text-sm text-slate-600 font-medium">Total {profile.totalChallenges > 1 ? 'Challenges' : 'Challenge'}</p>
-                                <p className="text-3xl font-bold text-indigo-600">{profile.totalChallenges < 1 ? 'No Challenge Found' : profile.totalChallenges}</p>
-                            </div>
-                            </div>
-                        </div>
+                            <h2 className="text-3xl font-bold text-white mt-6">{profile.name}</h2>
+                            <p className="text-indigo-200 mt-2">Member since {new Date(profile.createdAt || Date.now()).toLocaleDateString()}</p>
                         </div>
 
-                        {error && (
-                            <div className="text-sm text-red-700 font-medium">{error}</div>
-                        )}
-
-                        {/* Email Section */}
-                        <div className="border-b border-slate-100 pb-6">
-                        <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                            <Mail className="w-5 h-5 text-indigo-600" />
-                            <label className="text-sm font-semibold text-slate-700">Email</label>
+                        {/* Profile Content */}
+                        <div className="p-8 space-y-8">
+                            {/* Total Challenges Card */}
+                            <div className="group bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-2xl p-6 border border-white/20 backdrop-blur-sm hover:ring-4 hover:ring-indigo-400/30 transition-all duration-300">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                            <Trophy className="w-8 h-8 text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-indigo-200 text-sm font-medium">Total Challenges</p>
+                                            <p className="text-4xl font-extrabold text-white">
+                                                {profile.totalChallenges || 0}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            {!isEditingEmail && (
-                            <button
-                                onClick={() => {
-                                setIsEditingEmail(true);
-                                setTempEmail(profile.email);
-                                }}
-                                className="text-indigo-600 hover:text-indigo-700 p-1"
-                            >
-                                <Edit2 className="w-4 h-4" />
-                            </button>
+
+                            {error && (
+                                <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl text-sm">
+                                    {error}
+                                </div>
                             )}
-                        </div>
-                        
-                        {isEditingEmail ? (
-                            <div className="space-y-3">
-                            <input
-                                type="email"
-                                value={tempEmail}
-                                onChange={(e) => setTempEmail(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-1 transition-all text-slate-800"
-                                placeholder="New Email"
-                            />
-                            <div className="flex gap-2">
-                                <button
-                                onClick={handleSaveEmail}
-                                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                                >
-                                <Save className="w-4 h-4" />
-                                save
-                                </button>
-                                <button
-                                onClick={() => setIsEditingEmail(false)}
-                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-all"
-                                >
-                                <X className="w-4 h-4" />
-                                </button>
-                            </div>
-                            </div>
-                        ) : (
-                            <p className="text-slate-800 font-medium mt-1 px-4 py-3 bg-slate-50 rounded-xl">
-                            {profile.email}
-                            </p>
-                        )}
-                        </div>
 
-                        {/* Password Section */}
-                        <div className="border-b border-slate-100 pb-6">
-                        <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                            <Lock className="w-5 h-5 text-indigo-600" />
-                            <label className="text-sm font-semibold text-slate-700">Update Password</label>
-                            </div>
-                            {!isEditingPassword && (
-                            <button
-                                onClick={() => setIsEditingPassword(true)}
-                                className="text-indigo-600 hover:text-indigo-700 p-1"
-                            >
-                                <Edit2 className="w-4 h-4" />
-                            </button>
-                            )}
-                        </div>
-                        
-                        {isEditingPassword ? (
-                            <div className="space-y-3">
-                            <div className="relative">
-                                <input
-                                type={showPassword ? "text" : "password"}
-                                value={tempPassword}
-                                onChange={(e) => setTempPassword(e.target.value)}
-                                className="w-full text-slate-800 px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-1 transition-all"
-                                placeholder="New Password (min. 8 character)"
-                                />
-                                <button
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                </button>
-                            </div>
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full text-slate-800 px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-1 transition-all"
-                                placeholder="New password confirmation"
-                            />
-                            {tempPassword && confirmPassword && tempPassword !== confirmPassword && (
-                                <p className="text-red-500 text-sm">Password doesn't match</p>
-                            )}
-                            {tempPassword && tempPassword.length < 8 && (
-                                <p className="text-orange-500 text-sm">Password must be at least 8 character</p>
-                            )}
-                            <div className="flex gap-2">
-                                <button
-                                onClick={handleSavePassword}
-                                disabled={!tempPassword || tempPassword !== confirmPassword || tempPassword.length < 8}
-                                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                <Save className="w-4 h-4" />
-                                save
-                                </button>
-                                <button
-                                onClick={() => {
-                                    setIsEditingPassword(false);
-                                    setTempPassword('');
-                                    setConfirmPassword('');
-                                }}
-                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-all"
-                                >
-                                <X className="w-4 h-4" />
-                                </button>
-                            </div>
-                            </div>
-                        ) : (
-                            <p className="text-slate-800 font-medium mt-1 px-4 py-3 bg-slate-50 rounded-xl">
-                            {profile.password}
-                            </p>
-                        )}
-                        </div>
+                            {/* Email Section */}
+                            <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <Mail className="w-6 h-6 text-indigo-400" />
+                                        <span className="text-lg font-semibold text-white">Email</span>
+                                    </div>
+                                    {!isEditingEmail && (
+                                        <button
+                                            onClick={() => {
+                                                setIsEditingEmail(true);
+                                                setTempEmail(profile.email);
+                                            }}
+                                            className="text-indigo-400 hover:text-white transition-colors"
+                                        >
+                                            <Edit2 className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
 
-                        {/* Delete Account */}
-                        <div className="pt-2">
-                        <button
-                            onClick={() => setShowDeleteModal(true)}
-                            className="w-full bg-red-50 text-red-600 py-3 rounded-xl font-medium hover:bg-red-100 transition-all flex items-center justify-center gap-2 border border-red-200"
-                        >
-                            <Trash2 className="w-5 h-5" />
-                            Delete Account
-                        </button>
+                                {isEditingEmail ? (
+                                    <div className="space-y-4">
+                                        <input
+                                            type="email"
+                                            value={tempEmail}
+                                            onChange={(e) => setTempEmail(e.target.value)}
+                                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 transition-all"
+                                            placeholder="Enter new email"
+                                        />
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={handleSaveEmail}
+                                                className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                                            >
+                                                <Save className="w-5 h-5" />
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={() => setIsEditingEmail(false)}
+                                                className="px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-white/90 text-lg px-4 py-3 bg-white/10 rounded-xl">
+                                        {profile.email}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Password Section */}
+                            <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <Lock className="w-6 h-6 text-indigo-400" />
+                                        <span className="text-lg font-semibold text-white">Update Password</span>
+                                    </div>
+                                    {!isEditingPassword && (
+                                        <button
+                                            onClick={() => setIsEditingPassword(true)}
+                                            className="text-indigo-400 hover:text-white transition-colors"
+                                        >
+                                            <Edit2 className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
+
+                                {isEditingPassword ? (
+                                    <div className="space-y-4">
+                                        <div className="relative">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                value={tempPassword}
+                                                onChange={(e) => setTempPassword(e.target.value)}
+                                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 transition-all"
+                                                placeholder="New password (min. 8 characters)"
+                                            />
+                                            <button
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                            >
+                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                            </button>
+                                        </div>
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 transition-all"
+                                            placeholder="Confirm new password"
+                                        />
+                                        {tempPassword && confirmPassword && tempPassword !== confirmPassword && (
+                                            <p className="text-red-400 text-sm">Passwords do not match</p>
+                                        )}
+                                        {tempPassword && tempPassword.length < 8 && (
+                                            <p className="text-orange-400 text-sm">Password must be at least 8 characters</p>
+                                        )}
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={handleSavePassword}
+                                                disabled={!tempPassword || tempPassword !== confirmPassword || tempPassword.length < 8}
+                                                className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                                            >
+                                                <Save className="w-5 h-5" />
+                                                Update Password
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setIsEditingPassword(false);
+                                                    setTempPassword('');
+                                                    setConfirmPassword('');
+                                                }}
+                                                className="px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-white/60 italic px-4 py-3">Click edit to change your password</p>
+                                )}
+                            </div>
+
+                            {/* Delete Account */}
+                            <div className="pt-4">
+                                <button
+                                    onClick={() => setShowDeleteModal(true)}
+                                    className="w-full bg-red-600/20 border border-red-500/50 text-red-400 py-4 rounded-xl font-medium hover:bg-red-600/30 hover:text-red-300 transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm"
+                                >
+                                    <Trash2 className="w-6 h-6" />
+                                    Delete Account Permanently
+                                </button>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
 
                 {/* Delete Confirmation Modal */}
                 {showDeleteModal && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                        <Trash2 className="w-6 h-6 text-red-600" />
+                    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-50">
+                        <div className="bg-gradient-to-br from-slate-900 to-indigo-900 rounded-3xl shadow-2xl border border-white/10 max-w-md w-full p-8">
+                            <div className="w-16 h-16 rounded-full bg-red-600/30 flex items-center justify-center mx-auto mb-6">
+                                <Trash2 className="w-8 h-8 text-red-400" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white text-center mb-4">
+                                Delete Account?
+                            </h3>
+                            <p className="text-indigo-200 text-center mb-8">
+                                This action <span className="text-red-400 font-semibold">cannot be undone</span>. All your challenges and data will be permanently deleted.
+                            </p>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="flex-1 px-6 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDeleteAccount}
+                                    className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 hover:scale-105 transition-all duration-300 shadow-lg"
+                                >
+                                    Yes, Delete Account
+                                </button>
+                            </div>
                         </div>
-                        <h3 className="text-xl font-bold text-slate-800 text-center mb-2">
-                        Delete Account?
-                        </h3>
-                        <p className="text-slate-600 text-center mb-6">
-                        This action cannot be undone. All your data will be permanently deleted.
-                        </p>
-                        <div className="flex gap-3">
-                        <button
-                            onClick={() => setShowDeleteModal(false)}
-                            className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-all"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleDeleteAccount}
-                            className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all"
-                        >
-                            Yes, Delete
-                        </button>
-                        </div>
-                    </div>
                     </div>
                 )}
             </div>

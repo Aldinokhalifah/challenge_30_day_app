@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import HomePage from './pages/Home/page';
+import HomePage from './(dashboard)/Home/page';
 
 export default function Home() {
   return <HomePage />;

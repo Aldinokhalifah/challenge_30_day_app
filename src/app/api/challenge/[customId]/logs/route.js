@@ -37,7 +37,7 @@ export async function GET(req, {params}) {
 
     // Cek apakah sudah isi log hari ini
     let canFillToday = true;
-    let filledDayToday = null;
+    let filledDayToday = challenge.lastFilled.day || null;
 
     if(challenge.lastFilled?.dateISO === todayKey) {
         canFillToday = false;

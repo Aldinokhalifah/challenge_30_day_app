@@ -135,7 +135,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                                     Edit
                                 </button>
                                 <Link
-                                    href={`/pages/Challenges/${customId}`}
+                                    href={`/Challenges/${customId}`}
                                     className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white transition"
                                     onClick={() => setMenuOpen(false)}
                                 >
@@ -157,7 +157,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                                 {isPublic && (
                                     <button
                                         onClick={() => {
-                                        navigator.clipboard.writeText(`${window.location.origin}/pages/Challenge_public/${customId}`);
+                                        navigator.clipboard.writeText(`${window.location.origin}/Challenge_public/${customId}`);
                                         alert("Public URL copied to clipboard!");
                                         }}
                                         className="w-full text-left px-4 py-2 text-sm text-indigo-400 hover:bg-indigo-600/20 transition"
