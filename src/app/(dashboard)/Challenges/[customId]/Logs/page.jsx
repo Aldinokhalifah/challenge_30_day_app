@@ -3,7 +3,6 @@
 import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import Loading from "@/app/components/ui/loading";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Sidebar from "@/app/components/ui/sidebar";
 import { ArrowRightToLine, Menu } from "lucide-react";
@@ -13,9 +12,6 @@ import Link from "next/link";
 
 function Logs() {
     const { customId } = useParams();
-    const [loading, setLoading] = useState(true);
-    const [logs, setLogs] = useState(null);
-    const [error, setError] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     
     // Track user activity untuk inaktivitas check
@@ -35,31 +31,6 @@ function Logs() {
             window.removeEventListener("click", handleActivity);
         };
     }, []);
-
-    const fetchLogs = useCallback(async () => {
-        try {
-            const res = await fetch(`/api/challenge/${customId}/logs`, {
-                credentials: 'include'
-            }); 
-
-            if (!res.ok) throw new Error('Failed to fetch challenge');
-                const data = await res.json();
-                setLogs(data.logs);
-                console.log("canFillToday: " + data.canFillToday);
-                console.log("filledDayToday: " + data.filledDayToday);
-        } catch (err) {
-            console.error("Error fetching challenge:", err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }, [customId])
-
-    useEffect(() => {
-        if (customId) fetchLogs();
-    }, [customId]);
-
-    if (error) return <div className="flex items-center justify-center min-h-screen text-red-400">Error: {error}</div>;
 
     return (
             <AnimatedGradientBg>
@@ -90,9 +61,6 @@ function Logs() {
                         
                         {/* Content */}
                         <main>
-                            {loading ? (
-                                <Loading />
-                            ) : (
                                 <div className="flex-1 p-4 lg:p-8 space-y-8">
                                     {/* Page Title - Desktop */}
                                     <div className="hidden lg:flex lg:justify-between">
@@ -112,7 +80,7 @@ function Logs() {
                                     </div>
 
                                     {/* Days Grid */}
-                                    <LogCard log={logs}/>
+                                    <LogCard />
 
                                     {/* Legend */}
                                     <div className="flex flex-wrap items-center justify-center gap-6 pt-8 border-t border-white/10">
@@ -130,7 +98,6 @@ function Logs() {
                                         </div>
                                     </div>
                                 </div>
-                            )}
                         </main>
                     </div>
                 </div>

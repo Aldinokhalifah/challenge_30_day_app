@@ -2,10 +2,11 @@ import { useParams } from "next/navigation";
 import { useState, useCallback, useEffect } from "react";
 import { Clock, XCircle, CheckCircle, Calendar, Sparkles, Save, FileText, Lock, AlertCircle } from "lucide-react";
 import ReminderLog from "./ReminderLog";
+import Loading from "./loading";
 
-export default function LogCard({ log }) {
+export default function LogCard() {
     const { customId } = useParams();
-    const [logs, setLogs] = useState(log);
+    const [logs, setLogs] = useState([]);
     const [updatingLog, setUpdatingLog] = useState(null);
     const [showConfirmation, setShowConfirmation] = useState(null);
     const [editingLog, setEditingLog] = useState(null);
@@ -15,12 +16,11 @@ export default function LogCard({ log }) {
     const [canFillToday, setCanFillToday] = useState(true);
     const [filledDayToday, setFilledDayToday] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const reloadChallenges = useCallback(async () => {
-        if (isLoading) return; 
-        
-        setIsLoading(true);
         try {
+            setIsLoading(true);
             const res = await fetch(`/api/challenge/${customId}/logs`, {
                 credentials: 'include',
             });
@@ -36,10 +36,15 @@ export default function LogCard({ log }) {
             setFilledDayToday(data.filledDayToday);
         } catch (error) {
             console.error('Error fetching logs:', error);
+            setError(error.message);
         } finally {
             setIsLoading(false);
         }
     }, [customId]);
+
+    useEffect(() => {
+        if(customId) reloadChallenges();
+    }, [customId])
 
     const handleEditLog = useCallback((log) => {
         setEditingLog(log.day);
@@ -65,9 +70,6 @@ export default function LogCard({ log }) {
             const res = await fetch(`/api/challenge/${customId}/logs/${days}`, {
                 method: "PUT",
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify({
                     status: selectedStatus,
                     note: noteInput,
@@ -141,226 +143,226 @@ export default function LogCard({ log }) {
         };
     };
 
-    if (!logs || logs.length === 0) {
-        return (
-            <h1 className="flex items-center justify-center min-h-screen text-white text-2xl">
-                Logs Not Found
-            </h1>
-        );
-    }
-
     return (
         <>
             {!canFillToday && filledDayToday && (
                 <ReminderLog  filledDayToday={filledDayToday}/>
             )}
 
-            {/* Days Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {logs.map((log) => {
-                    const { canFillThisLog, shouldDisable, isPending, isNextToFill } = canFillLog(log.day, log.status);
-                    const isFilled = log.status !== 'pending';
+            {error && (
+                <h1 className="text-red-900 text-center">Logs Not Found</h1>
+            )}
 
-                    return (
-                        <div
-                            key={log.day}
-                            className={`
-                                group relative bg-gradient-to-br backdrop-blur-xl rounded-3xl border p-6 transition-all duration-500 overflow-hidden
-                                ${shouldDisable 
-                                    ? 'from-slate-900/40 to-slate-800/40 border-white/5 opacity-60' 
-                                    : 'from-slate-900/80 to-slate-800/80 border-white/10 hover:border-white/30 hover:shadow-2xl hover:shadow-indigo-500/20'
-                                }
-                                ${canFillThisLog ? 'ring-2 ring-indigo-500/50 shadow-xl shadow-indigo-500/30' : ''}
-                            `}
-                        >
-                            {/* Decorative Corner Element */}
+            {isLoading ? (
+                <Loading />
+            ) : (
+                // days grid
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {logs.map((log) => {
+                        const { canFillThisLog, shouldDisable, isPending, isNextToFill } = canFillLog(log.day, log.status);
+                        const isFilled = log.status !== 'pending';
+
+                        return (
                             <div
-                                className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${getStatusColor(
-                                    log.status
-                                )} opacity-10 rounded-full blur-2xl transition-all duration-700`}
-                            ></div>
+                                key={log.day}
+                                className={`
+                                    group relative bg-gradient-to-br backdrop-blur-xl rounded-3xl border p-6 transition-all duration-500 overflow-hidden
+                                    ${shouldDisable 
+                                        ? 'from-slate-900/40 to-slate-800/40 border-white/5 opacity-60' 
+                                        : 'from-slate-900/80 to-slate-800/80 border-white/10 hover:border-white/30 hover:shadow-2xl hover:shadow-indigo-500/20'
+                                    }
+                                    ${canFillThisLog ? 'ring-2 ring-indigo-500/50 shadow-xl shadow-indigo-500/30' : ''}
+                                `}
+                            >
+                                {/* Decorative Corner Element */}
+                                <div
+                                    className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${getStatusColor(
+                                        log.status
+                                    )} opacity-10 rounded-full blur-2xl transition-all duration-700`}
+                                ></div>
 
-                            {/*Locked Badge - untuk log yang disabled */}
-                            {shouldDisable && (
-                                <div className="absolute top-3 right-3 z-10 bg-slate-700/80 text-gray-400 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
-                                    <Lock className="w-3 h-3" />
-                                    Locked
-                                </div>
-                            )}
-
-                            {/*Next Day Badge */}
-                            {canFillThisLog && (
-                                <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-indigo-500/50 flex items-center gap-1.5 animate-pulse">
-                                    <Sparkles className="w-3 h-3" />
-                                    Fill Today
-                                </div>
-                            )}
-
-                            {/* Confirmation Badge */}
-                            {showConfirmation === log.day && (
-                                <div className="absolute -top-0.5 -right-3 z-10 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-emerald-500/50 flex items-center gap-1.5 animate-bounce">
-                                    <Sparkles className="w-3 h-3" />
-                                    Saved!
-                                </div>
-                            )}
-
-                            {/* Day Header */}
-                            <div className="relative flex items-center justify-between mb-5 pb-4 border-b border-white/10">
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className={`relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 bg-gradient-to-br ${getStatusColor(
-                                            log.status
-                                        )} ${
-                                            log.status === "completed"
-                                                ? "shadow-emerald-500/50"
-                                                : log.status === "pending"
-                                                ? "shadow-amber-500/50"
-                                                : "shadow-red-500/50"
-                                        }`}
-                                    >
-                                        <div className="text-white">{getStatusIcon(log.status)}</div>
+                                {/*Locked Badge - untuk log yang disabled */}
+                                {shouldDisable && (
+                                    <div className="absolute top-3 right-3 z-10 bg-slate-700/80 text-gray-400 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
+                                        <Lock className="w-3 h-3" />
+                                        Locked
                                     </div>
-                                    <div>
-                                        <h3 className="text-white font-bold text-xl">
-                                            Day {log.day}
-                                        </h3>
-                                        <div className="flex items-center gap-1.5 text-gray-400 text-xs mt-0.5">
-                                            <Calendar className="w-3 h-3" />
-                                            <span className="capitalize">{log.status}</span>
+                                )}
+
+                                {/*Next Day Badge */}
+                                {canFillThisLog && (
+                                    <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg shadow-indigo-500/50 flex items-center gap-1.5 animate-pulse">
+                                        <Sparkles className="w-3 h-3" />
+                                        Fill Today
+                                    </div>
+                                )}
+
+                                {/* Confirmation Badge */}
+                                {showConfirmation === log.day && (
+                                    <div className="absolute -top-0.5 -right-3 z-10 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-emerald-500/50 flex items-center gap-1.5 animate-bounce">
+                                        <Sparkles className="w-3 h-3" />
+                                        Saved!
+                                    </div>
+                                )}
+
+                                {/* Day Header */}
+                                <div className="relative flex items-center justify-between mb-5 pb-4 border-b border-white/10">
+                                    <div className="flex items-center gap-3">
+                                        <div
+                                            className={`relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 bg-gradient-to-br ${getStatusColor(
+                                                log.status
+                                            )} ${
+                                                log.status === "completed"
+                                                    ? "shadow-emerald-500/50"
+                                                    : log.status === "pending"
+                                                    ? "shadow-amber-500/50"
+                                                    : "shadow-red-500/50"
+                                            }`}
+                                        >
+                                            <div className="text-white">{getStatusIcon(log.status)}</div>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-xl">
+                                                Day {log.day}
+                                            </h3>
+                                            <div className="flex items-center gap-1.5 text-gray-400 text-xs mt-0.5">
+                                                <Calendar className="w-3 h-3" />
+                                                <span className="capitalize">{log.status}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/*Disabled Message */}
-                            {shouldDisable && (
-                                <div className="mb-4 bg-slate-800/40 border border-slate-700/50 rounded-xl p-3">
-                                    <p className="text-gray-400 text-xs flex items-center gap-2">
-                                        <Lock className="w-4 h-4" />
-                                        Complete Day {nextDayToFill} first
-                                    </p>
-                                </div>
-                            )}
+                                {/*Disabled Message */}
+                                {shouldDisable && (
+                                    <div className="mb-4 bg-slate-800/40 border border-slate-700/50 rounded-xl p-3">
+                                        <p className="text-gray-400 text-xs flex items-center gap-2">
+                                            <Lock className="w-4 h-4" />
+                                            Complete Day {nextDayToFill} first
+                                        </p>
+                                    </div>
+                                )}
 
-                            {/* Status Form */}
-                            {editingLog === log.day ? (
-                                <div className="relative space-y-4">
-                                    {/* Status Select */}
-                                    <div>
-                                        <label className="text-gray-300 text-sm font-medium block mb-2">
-                                            Status
-                                        </label>
-                                        <select
-                                            value={selectedStatus}
-                                            onChange={(e) => setSelectedStatus(e.target.value)}
-                                            disabled={isFilled}
-                                            className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            <option value="completed">✓ Completed</option>
-                                            <option value="pending">○ Pending</option>
-                                            <option value="missed">✗ Missed</option>
-                                        </select>
-                                        {isFilled && (
-                                            <p className="text-gray-500 text-xs mt-1">
-                                                Status cannot be changed after filling
-                                            </p>
+                                {/* Status Form */}
+                                {editingLog === log.day ? (
+                                    <div className="relative space-y-4">
+                                        {/* Status Select */}
+                                        <div>
+                                            <label className="text-gray-300 text-sm font-medium block mb-2">
+                                                Status
+                                            </label>
+                                            <select
+                                                value={selectedStatus}
+                                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                                disabled={isFilled}
+                                                className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <option value="completed">✓ Completed</option>
+                                                <option value="pending">○ Pending</option>
+                                                <option value="missed">✗ Missed</option>
+                                            </select>
+                                            {isFilled && (
+                                                <p className="text-gray-500 text-xs mt-1">
+                                                    Status cannot be changed after filling
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Note Input */}
+                                        <div>
+                                            <label className="text-gray-300 text-sm font-medium mb-2 flex items-center gap-2">
+                                                <FileText className="w-4 h-4" />
+                                                Note
+                                            </label>
+                                            <textarea
+                                                value={noteInput}
+                                                onChange={(e) => setNoteInput(e.target.value)}
+                                                placeholder="Add your daily note..."
+                                                rows={3}
+                                                className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none"
+                                            />
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleSaveLog(log.day)}
+                                                disabled={updatingLog === log.day}
+                                                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
+                                            >
+                                                {updatingLog === log.day ? (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span>Saving...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4" />
+                                                        <span>Save</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button
+                                                onClick={handleCancelEdit}
+                                                disabled={updatingLog === log.day}
+                                                className="px-4 py-3 bg-slate-700/50 text-gray-300 font-semibold rounded-xl hover:bg-slate-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="relative space-y-4">
+                                        {/* Display Note */}
+                                        {log.note ? (
+                                            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4">
+                                                <p className="text-gray-400 text-xs font-medium mb-2 flex items-center gap-1.5">
+                                                    <FileText className="w-3 h-3" />
+                                                    Note
+                                                </p>
+                                                <p className="text-gray-300 text-sm leading-relaxed max-h-20 overflow-y-auto">
+                                                    {log.note}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-slate-800/40 border border-slate-700/50 border-dashed rounded-xl p-4 text-center">
+                                                <FileText className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                                                <p className="text-gray-500 text-xs">No note added yet</p>
+                                            </div>
                                         )}
-                                    </div>
 
-                                    {/* Note Input */}
-                                    <div>
-                                        <label className="text-gray-300 text-sm font-medium mb-2 flex items-center gap-2">
-                                            <FileText className="w-4 h-4" />
-                                            Note
-                                        </label>
-                                        <textarea
-                                            value={noteInput}
-                                            onChange={(e) => setNoteInput(e.target.value)}
-                                            placeholder="Add your daily note..."
-                                            rows={3}
-                                            className="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none"
-                                        />
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2">
+                                        {/* Edit Button */}
                                         <button
-                                            onClick={() => handleSaveLog(log.day)}
-                                            disabled={updatingLog === log.day}
-                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
+                                            onClick={() => handleEditLog(log)}
+                                            disabled={shouldDisable}
+                                            className={`
+                                                w-full px-4 py-3 font-semibold rounded-xl transition-all duration-200
+                                                ${shouldDisable
+                                                    ? 'bg-slate-700/30 border border-slate-700/50 text-gray-600 cursor-not-allowed'
+                                                    : isFilled
+                                                        ? 'bg-slate-700/50 border border-slate-600/50 text-slate-300 hover:bg-slate-700 hover:border-slate-600'
+                                                        : 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 hover:border-indigo-500/50'
+                                                }
+                                            `}
                                         >
-                                            {updatingLog === log.day ? (
-                                                <>
-                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                    <span>Saving...</span>
-                                                </>
+                                            {shouldDisable ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <Lock className="w-4 h-4" />
+                                                    Locked
+                                                </span>
+                                            ) : isFilled ? (
+                                                'Edit Note Only'
                                             ) : (
-                                                <>
-                                                    <Save className="w-4 h-4" />
-                                                    <span>Save</span>
-                                                </>
+                                                'Fill Log'
                                             )}
                                         </button>
-                                        <button
-                                            onClick={handleCancelEdit}
-                                            disabled={updatingLog === log.day}
-                                            className="px-4 py-3 bg-slate-700/50 text-gray-300 font-semibold rounded-xl hover:bg-slate-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            Cancel
-                                        </button>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="relative space-y-4">
-                                    {/* Display Note */}
-                                    {log.note ? (
-                                        <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4">
-                                            <p className="text-gray-400 text-xs font-medium mb-2 flex items-center gap-1.5">
-                                                <FileText className="w-3 h-3" />
-                                                Note
-                                            </p>
-                                            <p className="text-gray-300 text-sm leading-relaxed max-h-20 overflow-y-auto">
-                                                {log.note}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className="bg-slate-800/40 border border-slate-700/50 border-dashed rounded-xl p-4 text-center">
-                                            <FileText className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-                                            <p className="text-gray-500 text-xs">No note added yet</p>
-                                        </div>
-                                    )}
-
-                                    {/* Edit Button */}
-                                    <button
-                                        onClick={() => handleEditLog(log)}
-                                        disabled={shouldDisable}
-                                        className={`
-                                            w-full px-4 py-3 font-semibold rounded-xl transition-all duration-200
-                                            ${shouldDisable
-                                                ? 'bg-slate-700/30 border border-slate-700/50 text-gray-600 cursor-not-allowed'
-                                                : isFilled
-                                                    ? 'bg-slate-700/50 border border-slate-600/50 text-slate-300 hover:bg-slate-700 hover:border-slate-600'
-                                                    : 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 hover:border-indigo-500/50'
-                                            }
-                                        `}
-                                    >
-                                        {shouldDisable ? (
-                                            <span className="flex items-center justify-center gap-2">
-                                                <Lock className="w-4 h-4" />
-                                                Locked
-                                            </span>
-                                        ) : isFilled ? (
-                                            'Edit Note Only'
-                                        ) : (
-                                            'Fill Log'
-                                        )}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </>
     );
 }

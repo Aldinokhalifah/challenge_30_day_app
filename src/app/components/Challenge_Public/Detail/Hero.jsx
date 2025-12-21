@@ -1,125 +1,204 @@
-import { Calendar, Target, Flame, CheckCircle, Clock } from "lucide-react";
-import { motion } from "framer-motion"; 
+import { Calendar, Target, Flame, CheckCircle, Clock, Award } from "lucide-react";
+import { motion } from "framer-motion";
+import PublicBadge from "../../ui/challenge_public/hero/publicBadge";
+import ShareButton from "../../ui/challenge_public/hero/shareButton";
+import StatsCircle from "../../ui/challenge_public/hero/statsCircle";
+import StatCard from "../../ui/challenge_public/hero/statsCard";
+import StatsSocial from "../../ui/challenge_public/hero/statsSocial";
 
 export default function HeroChallengeDetailPublic({ challenge, statistic }) {
     const stats = statistic || {
         completedDays: challenge.logs.filter(l => l.status === "completed").length,
         pendingDays: challenge.logs.filter(l => l.status === "pending").length,
-        longestStreak: getStreakCount() 
+        longestStreak: getStreakCount(),
     };
+
+    // mock data
+    const totalViews = 120;
+    const participants = 55;
+
+    const completionRate = Math.round((stats.completedDays / challenge.logs.length) * 100);
+    const currentDay = challenge.logs.filter(l => l.status !== "pending").length + 1;
 
     return (
         <>
-            {/* Hero Card - Challenge Info */}
-            <div className="relative bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden parallax-bg">
-                {/* Background decorations - Enhanced with more radial gradients and parallax */}
-                <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-gradient-radial from-indigo-500/30 to-purple-500/10 rounded-full blur-3xl opacity-70 animate-pulse slow"></div>
-                <div className="absolute bottom-[-15%] left-[-5%] w-80 h-80 bg-gradient-radial from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl opacity-60"></div>
-                {/* Tambah SVG untuk orbit unik - Futuristic lines */}
-                <svg className="absolute top-0 left-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="0.5" fill="none" strokeDasharray="5,5" />
-                    <circle cx="60" cy="40" r="30" stroke="indigo" strokeWidth="0.3" fill="none" strokeDasharray="3,3" />
-                </svg>
-                {/* Placeholder for particles - Integrate tsParticles here */}
-                {/* <div id="particles-js" className="absolute inset-0"></div> */}
+            {/* Main Hero Container - Asymmetric Design */}
+            <div className="relative rounded-[2.5rem] overflow-hidden">
+                {/* Dynamic Gradient Background - More vibrant */}
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 via-purple-600/20 via-40% to-orange-500/20 backdrop-blur-3xl"></div>
+                
+                {/* Animated Orbs - More dramatic */}
+                <div className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-radial from-pink-500/40 via-purple-500/20 to-transparent rounded-full blur-3xl animate-float"></div>
+                <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-radial from-orange-500/40 via-amber-500/20 to-transparent rounded-full blur-3xl animate-float-delayed"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-radial from-purple-500/30 to-transparent rounded-full blur-2xl animate-pulse-slow"></div>
 
-                <div className="relative z-10 space-y-6 md:ml-12"> {/* Asymmetrical shift untuk unik */}
+                {/* Diagonal Grid Pattern */}
+                <div className="absolute inset-0 opacity-5">
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: `linear-gradient(45deg, white 1px, transparent 1px),
+                                         linear-gradient(-45deg, white 1px, transparent 1px)`,
+                        backgroundSize: '30px 30px'
+                    }}></div>
+                </div>
 
-                    {/* Status Badge - Tambah hover interaksi */}
-                    <div className="flex md:justify-between flex-col md:flex-row gap-4 animate-fade-in">
-                        <div className="flex items-center flex-col md:flex-row gap-4">
-                            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-600/20 to-green-600/20 backdrop-blur-sm rounded-2xl border border-emerald-500/30 transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/30 hover:shadow-lg">
-                                <div className="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-                                <span className="text-emerald-300 font-semibold">Public Challenge</span>
-                            </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/10 transition-all duration-300 hover:bg-slate-700/60 hover:border-white/20">
-                                <Calendar className="w-4 h-4 text-indigo-400" />
-                                <span className="text-gray-300 text-sm">
-                                    Started {new Date(challenge.startDate).toLocaleDateString('id-ID', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric'
-                                    })}
+                {/* Content Container */}
+                <div className="relative z-10 border border-pink-500/30 rounded-[2.5rem] bg-slate-900/40 backdrop-blur-xl p-8 md:p-12"
+                    onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/Challenge_public/${challenge.customId}`);
+                        alert("Public URL copied to clipboard!");
+                    }}
+                >
+                    
+                    {/* Top Bar - Public Badge + Social Stats */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                        {/* Public Badge - Glowing */}
+                        <motion.div 
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-pink-500 to-orange-500 rounded-full shadow-lg shadow-pink-500/50 relative overflow-hidden"
+                            whileHover={{ scale: 1.05 }}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                        >
+                            <PublicBadge />
+                        </motion.div>
+
+                        {/* Social Stats - Floating */}
+                        < StatsSocial totalViews={totalViews} participants={participants}/>
+                    </div>
+
+                    {/* Main Content Grid - Asymmetric Layout */}
+                    <div className="grid lg:grid-cols-5 gap-8 items-start">
+                        
+                        {/* Left Side - Title & Description (3 cols) */}
+                        <div className="lg:col-span-3 space-y-6">
+                            
+                            {/* Title - Massive & Gradient */}
+                            <motion.h1 
+                                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-orange-400 bg-clip-text text-transparent inline-block animate-gradient bg-[length:200%_auto]">
+                                    {challenge.title}
                                 </span>
-                            </div>
+                            </motion.h1>
+
+                            {/* Description */}
+                            <motion.p 
+                                className="text-gray-300 text-lg md:text-xl leading-relaxed"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                {challenge.description}
+                            </motion.p>
+
+                            {/* Creator Info - Card Style */}
+                            <motion.div 
+                                className="flex items-center gap-4 bg-slate-800/60 backdrop-blur-md rounded-2xl p-4 border border-white/10 w-fit hover:border-pink-500/50 transition-all group"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                <div className="relative">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-pink-500/50 group-hover:scale-110 transition-transform">
+                                        {challenge.creator?.[0] || 'U'}
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center">
+                                        <Award className="w-3 h-3 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-gray-400 text-xs font-medium">Challenge Creator</div>
+                                    <div className="text-white font-bold text-lg">{challenge.creator || 'Anonymous'}</div>
+                                </div>
+                                <div className="ml-auto">
+                                    <Calendar className="w-5 h-5 text-gray-400" />
+                                </div>
+                            </motion.div>
+
+                            {/* Share Button - Call to Action */}
+                            <ShareButton />
                         </div>
+
+                        {/* Right Side - Stats Circle (2 cols) */}
+                        <StatsCircle completionRate={completionRate} currentDay={currentDay} length={challenge.logs.length} startDate={challenge.startDate}/>
                     </div>
 
-                    {/* Title and Description - Tambah gradient animasi */}
-                    <div className="space-y-4 animate-fade-in-up">
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-white via-indigo-200 to-blue-400 bg-clip-text text-transparent leading-tight transition-all duration-500 hover:from-indigo-200 hover:via-blue-400 hover:to-purple-400">
-                            {challenge.title}
-                        </h1>
-                        <p className="text-gray-300 text-lg leading-relaxed max-w-3xl transition-all duration-300 hover:text-gray-100 cursor-pointer"> {/* Click to expand if needed */}
-                            {challenge.description}
-                        </p>
-                    </div>
-
-                    {/* Quick Stats - Grid asymmetrical, hover interaktif */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 animate-fade-in-up delay-200">
-                        {/* Completed */}
-                        <motion.div 
-                            className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-emerald-500/40 hover:border-emerald-500/50 cursor-pointer"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
-                                    <CheckCircle className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-white">{stats.completedDays}</div>
-                                    <div className="text-xs text-gray-400">Completed</div>
-                                </div>
-                            </div>
-                        </motion.div>
-                        {/* Pending */}
-                        <motion.div 
-                            className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/40 hover:border-amber-500/50 cursor-pointer"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                                    <Clock className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-white">{stats.pendingDays}</div>
-                                    <div className="text-xs text-gray-400">Pending</div>
-                                </div>
-                            </div>
-                        </motion.div>
-                        {/* Streak */}
-                        <motion.div 
-                            className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/40 hover:border-orange-500/50 cursor-pointer"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                                    <Flame className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-white">{stats.longestStreak}</div>
-                                    <div className="text-xs text-gray-400">Streak</div>
-                                </div>
-                            </div>
-                        </motion.div>
-                        {/* Remaining */}
-                        <motion.div 
-                            className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/40 hover:border-purple-500/50 cursor-pointer"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                                    <Target className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-white">{stats.pendingDays}</div>
-                                    <div className="text-xs text-gray-400">Remaining</div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
+                    {/* Bottom Stats Bar - Horizontal Cards */}
+                    <motion.div 
+                        className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-8 border-t border-white/10"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                    >
+                        <StatCard
+                            icon={<CheckCircle className="w-6 h-6" />}
+                            value={stats.completedDays}
+                            label="Completed"
+                            gradient="from-emerald-500 to-green-500"
+                            glowColor="emerald"
+                        />
+                        <StatCard
+                            icon={<Clock className="w-6 h-6" />}
+                            value={stats.pendingDays}
+                            label="Pending"
+                            gradient="from-amber-500 to-orange-500"
+                            glowColor="amber"
+                        />
+                        <StatCard
+                            icon={<Flame className="w-6 h-6" />}
+                            value={stats.longestStreak}
+                            label="Best Streak"
+                            gradient="from-orange-500 to-red-500"
+                            glowColor="orange"
+                        />
+                        <StatCard
+                            icon={<Target className="w-6 h-6" />}
+                            value={stats.pendingDays}
+                            label="To Go"
+                            gradient="from-purple-500 to-pink-500"
+                            glowColor="purple"
+                        />
+                    </motion.div>
                 </div>
             </div>
+
+            {/* Custom CSS for animations */}
+            <style jsx>{`
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
+                @keyframes float {
+                    0%, 100% { transform: translate(0, 0) scale(1); }
+                    50% { transform: translate(30px, -30px) scale(1.1); }
+                }
+                @keyframes float-delayed {
+                    0%, 100% { transform: translate(0, 0) scale(1); }
+                    50% { transform: translate(-30px, 30px) scale(1.1); }
+                }
+                @keyframes pulse-slow {
+                    0%, 100% { opacity: 0.3; transform: scale(1); }
+                    50% { opacity: 0.5; transform: scale(1.05); }
+                }
+                @keyframes spin-slow {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                @keyframes gradient {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+                .animate-shimmer { animation: shimmer 3s infinite; }
+                .animate-float { animation: float 8s ease-in-out infinite; }
+                .animate-float-delayed { animation: float-delayed 10s ease-in-out infinite; }
+                .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
+                .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+                .animate-gradient { animation: gradient 3s ease infinite; }
+                .drop-shadow-glow-pink { filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.6)); }
+            `}</style>
         </>
     );
 }
