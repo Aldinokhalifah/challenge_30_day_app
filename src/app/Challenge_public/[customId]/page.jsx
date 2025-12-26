@@ -1,11 +1,12 @@
 'use client';
 
+import React from "react";
 import { useEffect, useState } from "react";
 import Loading from "../../components/ui/loading";
 import ChallengeDetailPublic from "@/app/components/Challenge_Public/Detail/page";
 import { useParams } from "next/navigation";
 
-export default function ChallengeDetailPagePublic() {
+function ChallengeDetailPagePublic() {
     const params = useParams();
     const customId = params.customId;
     const [challenge, setChallenge] = useState(null);
@@ -65,3 +66,5 @@ export default function ChallengeDetailPagePublic() {
     
     return <ChallengeDetailPublic challenge={challenge} statistic={statistic} />;
 }
+
+export default React.memo(ChallengeDetailPagePublic);
