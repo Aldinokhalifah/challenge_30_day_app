@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Calendar, Target, Flame, CheckCircle, Clock, Award } from "lucide-react";
 import { motion } from "framer-motion";
 import PublicBadge from "../../ui/challenge_public/hero/publicBadge";
@@ -9,8 +10,12 @@ import CreatorInfo from "../../ui/challenge_public/hero/creatorInfo";
 
 export default function HeroChallengeDetailPublic({ challenge, statistic }) {
     const stats = statistic || {
-        completedDays: challenge.logs.filter(l => l.status === "completed").length,
-        pendingDays: challenge.logs.filter(l => l.status === "pending").length,
+        completedDays: useMemo(() => {
+            return challenge.logs.filter(l => l.status === "completed").length
+        }, [challenge.logs]),
+        pendingDays: useMemo(() => {
+            return challenge.logs.filter(l => l.status === "pending").length
+        }, [challenge.logs]),
         longestStreak: getStreakCount(),
     };
 
@@ -19,7 +24,9 @@ export default function HeroChallengeDetailPublic({ challenge, statistic }) {
     const participants = 55;
 
     const completionRate = Math.round((stats.completedDays / challenge.logs.length) * 100);
-    const currentDay = challenge.logs.filter(l => l.status !== "pending").length + 1;
+    const currentDay = useMemo(() => {
+        return challenge.logs.filter(l => l.status !== "pending").length + 1
+    }, [challenge.logs]);
 
     return (
         <>

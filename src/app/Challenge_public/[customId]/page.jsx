@@ -67,4 +67,4 @@ function ChallengeDetailPagePublic() {
     return <ChallengeDetailPublic challenge={challenge} statistic={statistic} />;
 }
 
-export default React.memo(ChallengeDetailPagePublic);
+export default ChallengeDetailPagePublic;

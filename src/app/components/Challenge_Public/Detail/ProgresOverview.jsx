@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { CheckCircle, Target, Flame, XCircle } from "lucide-react";
 import { motion } from "framer-motion"; 
 import MiniStatCard from "../../ui/challenge_public/progressOverview/miniStatCard";
@@ -8,8 +9,12 @@ import MilestoneIndicator from "../../ui/challenge_public/progressOverview/miles
 import HeaderBadge from "../../ui/challenge_public/progressOverview/headerBadge";
 
 export default function ProgressOverviewPublic({ challenge, statistic }) {
-    const completedDays = challenge.logs.filter(l => l.status === "completed").length;
-    const missedDays = challenge.logs.filter(l => l.status === "missed").length;
+    const completedDays = useMemo(() => {
+        return challenge.logs.filter(l => l.status === "completed").length
+    }, [challenge.logs]);
+    const missedDays = useMemo(() => {
+        return challenge.logs.filter(l => l.status === "missed").length
+    }, [challenge.logs]);
     const totalDays = challenge.logs.length;
     
     const stats = statistic || {
@@ -73,7 +78,7 @@ export default function ProgressOverviewPublic({ challenge, statistic }) {
                             />
                             <MiniStatCard
                                 icon={<Target className="w-5 h-5" />}
-                                value={totalDays - stats.completedDays}
+                                value={totalDays - (stats.completedDays + missedDays)}
                                 label="Remaining"
                                 gradient="from-blue-500 to-cyan-500"
                                 delay={0.8}

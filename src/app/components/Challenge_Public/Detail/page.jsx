@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import AnimatedGradientBg from "../../ui/animatedBgGradient";
 import { Menu } from "lucide-react";
@@ -6,7 +7,7 @@ import ProgressOverviewPublic from "./ProgresOverview";
 import DailyLogsPublic from "./DailyLogs";
 import Sidebar from "../../ui/sidebar";
 
-export default function ChallengeDetailPublic({ challenge, reloadChallenges, statistic }) {
+function ChallengeDetailPublic({ challenge, reloadChallenges, statistic }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -39,10 +40,12 @@ export default function ChallengeDetailPublic({ challenge, reloadChallenges, sta
                             <ProgressOverviewPublic challenge={challenge} statistic={statistic}/>
 
                             {/* Daily Logs Grid */}
-                            <DailyLogsPublic challenge={challenge}/>
+                            <DailyLogsPublic challenge={challenge} statistic={statistic}/>
                         </main>
                     </div>
                 </div>
             </AnimatedGradientBg>
     );
 }
+
+export default React.memo(ChallengeDetailPublic);
