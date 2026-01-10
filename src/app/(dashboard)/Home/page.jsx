@@ -123,7 +123,7 @@ function HomePage() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                                {isRefreshing ? (
+                                {isRefreshing || loading ? (
                                     <Loading 
                                         message="Updating your progress..." 
                                         overlay={true}
