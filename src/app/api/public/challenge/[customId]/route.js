@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Challenge from "../../../../../../models/Challenge";
+import User from "../../../../../../models/User";
 
 export async function GET(req, {params}) {
     try {
@@ -29,7 +30,15 @@ export async function GET(req, {params}) {
 
         // Convert to object and remove sensitive data
         const challengeObj = challenge.toObject();
-        const { userId, ...safeData } = challengeObj;
+
+        const user = await User.findById(challengeObj.userId);
+        const { userId, ...challengeData } = challengeObj;
+        const safeData = {
+            ...challengeData,
+            creator: user?.name
+        };
+
+        console.log("safedata: ", safeData);
 
         return NextResponse.json({
             message: "Challenge fetched successfully",

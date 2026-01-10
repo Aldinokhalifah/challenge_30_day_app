@@ -2,7 +2,12 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = mongoose.Schema({
-    customId: Number,
+    userId: mongoose.Schema.Types.ObjectId,
+    customId: {
+        type: Number,
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
         required: true,
@@ -39,6 +44,9 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// compound index untuk query optimization
+userSchema.index({ userId: 1, customId: 1 });
 
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

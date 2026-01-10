@@ -11,7 +11,7 @@ export default function CreatorInfo({ name }) {
         >
         <div className="relative">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-pink-500/50 group-hover:scale-110 transition-transform uppercase">
-                {name?.[0] || "U"}
+                {name?.[0] || "A"}
             </div>
             <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-slate-900 flex items-center justify-center">
                 <Award className="w-3 h-3 text-white" />

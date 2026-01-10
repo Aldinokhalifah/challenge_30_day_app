@@ -98,7 +98,7 @@ export default function HeroChallengeDetailPublic({ challenge, statistic }) {
                             </motion.p>
 
                             {/* Creator Info - Card Style */}
-                            <CreatorInfo name={'test'}/>
+                            <CreatorInfo name={challenge.creator}/>
 
                             {/* Share Button - Call to Action */}
                             <ShareButton customId={challenge.customId}/>
