@@ -130,7 +130,7 @@ function HomePage() {
                                     />
                                 ) : (
                                     <div>
-                                        <Hero name={userData?.name} reloadChallenge={reloadAll}/>
+                                        <Hero name={userData?.name} reloadChallenge={reloadAll} stats={overviewStats}/>
                                         <div className="flex flex-col justify-center items-center gap-4 mt-20">
                                             <OverviewStats overviewStats={overviewStats}/>
                                         </div>

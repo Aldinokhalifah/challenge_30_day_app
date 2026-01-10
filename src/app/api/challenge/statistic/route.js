@@ -28,9 +28,27 @@ export async function GET(req) {
         const challengesWithProgress = challenges.map(challenge => {
             const completedDays = challenge.logs.filter(log => log.status === 'completed').length;
             const progress = Math.round((completedDays / 30) * 100); // Convert ke persentase
+
+            let longestStreak = 0, currentStreak = 0, totalStreak = 0, streakCount = 0;
+
+            challenge.logs.forEach(log => {
+                if(log.status === 'completed') {
+                    currentStreak++;
+                    if (currentStreak > longestStreak) longestStreak = currentStreak;
+                } else {
+                    if(currentStreak > 0) {
+                        totalStreak += currentStreak;
+                        streakCount++;
+                    }
+                    currentStreak = 0;
+                }
+            });
             
             return {
-                progress
+                progress,
+                totalStreak,
+                longestStreak,
+                completedDays
             };
         });
 
@@ -40,6 +58,8 @@ export async function GET(req) {
         const totalChallenges = challengesWithProgress.length;
         const completedChallenges = challengesWithProgress.filter(c => c.progress >= 100).length;
         const activeChallenges = totalChallenges - completedChallenges;
+        const completedDays = challengesWithProgress.reduce((acc, current) => acc + current.completedDays, 0);
+        const totalStreak = challengesWithProgress.reduce((acc, current) => acc + current.totalStreak, 0);
         
         let overallProgress = 0;
         if (totalChallenges > 0) {
@@ -48,9 +68,12 @@ export async function GET(req) {
             overallProgress = Math.min(overallProgress, 100);
             
             console.log("📊 Calculation:", {
-                sumProgress,
                 totalChallenges,
-                overallProgress
+                completedChallenges,
+                activeChallenges,
+                overallProgress,
+                completedDays,
+                totalStreak,
             });
         }
 
@@ -59,6 +82,8 @@ export async function GET(req) {
             completedChallenges,
             activeChallenges,
             overallProgress,
+            completedDays,
+            totalStreak,
         });
     } catch (error) {
         console.error("❌ Error overview stats:", error.message);

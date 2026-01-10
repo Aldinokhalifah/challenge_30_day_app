@@ -117,7 +117,7 @@ export default function HeroChallengeDetail({ challenge, reloadChallenges, stati
                                 </div>
                                 <div>
                                     <div className="text-2xl font-bold text-white">{stats.longestStreak}</div>
-                                    <div className="text-xs text-gray-400">Streak</div>
+                                    <div className="text-xs text-gray-400">Longest Streak</div>
                                 </div>
                             </div>
                         </div>
