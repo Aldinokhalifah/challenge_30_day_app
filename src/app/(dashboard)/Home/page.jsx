@@ -18,7 +18,7 @@ function HomePage() {
     const [userData, setUserData] = useState(null);
     const router = useRouter();
     const qc = useQueryClient();
-    const initialChallenges = readCache('challenges-v1');
+    const initialChallenges = readCache(`challenges-${userData?.id}`);
 
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -40,7 +40,6 @@ function HomePage() {
 
     useEffect(() => {
         const storedUserData = localStorage.getItem('userData');
-
         if (storedUserData) {
             try {
                 setUserData(JSON.parse(storedUserData));
@@ -60,9 +59,6 @@ function HomePage() {
         queryFn: fetchChallenges,
         initialData: initialChallenges || undefined,
         staleTime: 1000 * 30,
-        onSuccess(data) {
-            writeCache('challenges-v1', data);
-        }
     });
 
     const {
@@ -73,10 +69,15 @@ function HomePage() {
         queryKey: ['overviewStats'],
         queryFn: fetchOverviewStats,
         staleTime: 1000 * 10,
-        onSuccess(data) {
-            writeCache('overviews-v1', data);
-        }
     });
+
+    useEffect(() => {
+        if (challenges) writeCache(`challenges-${userData?.id}`, challenges);
+    }, [challenges]);
+
+    useEffect(() => {
+        if (overview) writeCache(`overviews-${userData?.id}`, overview);
+    }, [overview]);
 
     const reloadAll = async () => {
         await Promise.all([

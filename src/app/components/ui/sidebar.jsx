@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { LogOut, Home, CalendarCheck2, User2, X, LogIn } from 'lucide-react';
 import Image from 'next/image';
+import { useQueryClient } from "@tanstack/react-query";
 
 const nav = [
   { href: '/', label: 'Dashboard', icon: Home },
@@ -16,25 +17,25 @@ export default function Sidebar({ isOpen, onClose }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const userData = localStorage.getItem('userData');
 
   // Cek apakah user sudah login dari userData di localStorage
   useEffect(() => {
-    const userData = localStorage.getItem('userData');
     setIsLoggedIn(!!userData);
 
     // Listen untuk perubahan localStorage (dari tab lain atau logout)
     const handleStorageChange = () => {
-      const userData = localStorage.getItem('userData');
+      // const userData = localStorage.getItem('userData');
       setIsLoggedIn(!!userData);
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [userData]);
 
   const logout = useCallback(async () => {
     try {
-      // Call logout API untuk hapus cookies di server
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
@@ -42,17 +43,24 @@ export default function Sidebar({ isOpen, onClose }) {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Hapus dari localStorage
+      // Hapus semua cache di memori React Query
+      queryClient.clear();
+      
+      //Hapus data autentikasi & aktivitas
       localStorage.removeItem('userData');
-      localStorage.removeItem('lastActivity');
+
+      //Hapus cache manual
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('challenges-') || key.startsWith('overviews-')) {
+          localStorage.removeItem(key);
+        }
+      });
       
-      // Update state
       setIsLoggedIn(false);
-      
-      // Redirect ke login
       router.push('/Login');
     }
-  }, [router]);
+  }, [router, queryClient, userData]);
 
   return (
     <>
