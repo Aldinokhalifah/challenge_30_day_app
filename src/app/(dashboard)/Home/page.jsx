@@ -4,6 +4,9 @@ import React from "react";
 import Sidebar from "@/app/components/ui/sidebar";
 import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchChallenges, fetchOverviewStats } from "@/app/lib/api";
+import { readCache, writeCache } from "@/app/lib/localCache";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
@@ -12,14 +15,10 @@ import { useRouter } from 'next/navigation';
 
 function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [ userData, setUserData] = useState(null);
-    const [error, setError] = useState('');
-    const [challenge, setChallengeStats] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [overviewStats, setOverviewStats] = useState(null);
-    const [isInitialLoading, setIsInitialLoading] = useState(true);
-    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [userData, setUserData] = useState(null);
     const router = useRouter();
+    const qc = useQueryClient();
+    const initialChallenges = readCache('challenges-v1');
 
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -40,64 +39,50 @@ function HomePage() {
     }, []);
 
     useEffect(() => {
-        const userData = localStorage.getItem('userData');
+        const storedUserData = localStorage.getItem('userData');
 
-        if (userData) {
+        if (storedUserData) {
             try {
-                setUserData(JSON.parse(userData));
+                setUserData(JSON.parse(storedUserData));
             } catch (error) {
                 console.error('Error parsing userData:', error);
-                setError(error.message);
             }
         }
     }, []);
 
-    // Fungsi fetch data challenge
-    const fetchChallengeStats = async () => {
-        const res = await fetch('/api/challenge/read', {
-            credentials: 'include'
-        });
-        const data = await res.json();
-        setChallengeStats(data.challenges);
-        setLoading(false);
-    };
-
-    const fetchOverviewStats = async () => {
-        const res = await fetch("/api/challenge/statistic", {
-            credentials: 'include'
-        });
-        const data = await res.json();
-        setOverviewStats(data);
-    };
-
-    // Initial load
-    useEffect(() => {
-        const loadInitialData = async () => {
-            setLoading(true);
-            setIsInitialLoading(true);
-            try {
-                await Promise.all([
-                    fetchChallengeStats(),
-                    fetchOverviewStats()
-                ]);
-            } finally {
-                setIsInitialLoading(false);
-            }
-        };
-        loadInitialData();
-    }, [router]);
-
-     // Callback untuk reload setelah create/delete
-    const reloadAll = async () => {
-        setIsRefreshing(true);
-        try {
-            await Promise.all([
-                fetchChallengeStats(),
-                fetchOverviewStats()
-            ]);
-        } finally {
-            setIsRefreshing(false);
+    const {
+        data: challenges,
+        isLoading: challengesLoading,
+        isFetching: challengesFetching,
+        error: challengesError
+    } = useQuery({
+        queryKey: ['challenges'],
+        queryFn: fetchChallenges,
+        initialData: initialChallenges || undefined,
+        staleTime: 1000 * 30,
+        onSuccess(data) {
+            writeCache('challenges-v1', data);
         }
+    });
+
+    const {
+        data: overview,
+        isLoading: overviewLoading,
+        error: overviewError
+    } = useQuery({
+        queryKey: ['overviewStats'],
+        queryFn: fetchOverviewStats,
+        staleTime: 1000 * 10,
+        onSuccess(data) {
+            writeCache('overviews-v1', data);
+        }
+    });
+
+    const reloadAll = async () => {
+        await Promise.all([
+            qc.invalidateQueries({ queryKey: ['challenges'] }),
+            qc.invalidateQueries({ queryKey: ['overviewStats'] })
+        ]);
     };
 
     return (
@@ -123,16 +108,16 @@ function HomePage() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                                {isRefreshing || loading ? (
+                                {overviewLoading ? (
                                     <Loading 
-                                        message="Updating your progress..." 
+                                        message="Loading your challenges..." 
                                         overlay={true}
                                     />
                                 ) : (
                                     <div>
-                                        <Hero name={userData?.name} reloadChallenge={reloadAll} stats={overviewStats}/>
+                                        <Hero name={userData?.name} reloadChallenge={reloadAll} stats={overview}/>
                                         <div className="flex flex-col justify-center items-center gap-4 mt-20">
-                                            <OverviewStats overviewStats={overviewStats}/>
+                                            <OverviewStats overviewStats={overview}/>
                                         </div>
                                     </div>
                                 )}
