@@ -2,40 +2,39 @@ import { useEffect, useState } from 'react';
 import { User, Mail, Lock, Edit2, Trash2, Trophy, Eye, EyeOff, Save, X } from 'lucide-react';
 import Loading from '../ui/loading';
 import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { readCache } from '@/app/lib/localCache';
+import { fetchOverviewStats } from '@/app/lib/api';
 
 export default function ProfilePage() {
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingPassword, setIsEditingPassword] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [totalChallenges, setTotalChallenges] = useState(null);
     const [profile, setProfile] = useState({
         name: '',
         email: '',
         password: '••••••••',
-        totalChallenges: totalChallenges
+        timestamps: null
     });
     const [tempEmail, setTempEmail] = useState(profile.email);
     const [tempPassword, setTempPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
+    const qc = useQueryClient();
+    const initialChallenges = readCache(`overview-${profile?.id}`);
 
-    const fetchOverviewStats = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch("/api/challenge/statistic", {
-                credentials: 'include'
-            });
-            if (!res.ok) throw new Error('Failed to fetch stats');
-            const data = await res.json();
-            setTotalChallenges(data.totalChallenges);
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-            setError(error.message);
-        }
-    };
+    const {
+        data: overview,
+        isLoading: overviewLoading,
+        error: overviewError
+    } = useQuery({
+        queryKey: ['overviewStats'],
+        queryFn: fetchOverviewStats,
+        initialData: initialChallenges || 0,
+        staleTime: 1000 * 10,
+    });
 
     const fetchProfileData = async () => {
         try {
@@ -44,9 +43,10 @@ export default function ProfilePage() {
             
             setProfile(prev => ({
                 ...prev,
+                id: userData.id,
                 name: userData.name,
                 email: userData.email,
-                totalChallenges: totalChallenges
+                timestamps: userData.timestamps
             }));
         } catch (error) {
             console.error('Error fetching profile:', error);
@@ -57,30 +57,14 @@ export default function ProfilePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
-                await Promise.all([
-                    fetchOverviewStats(),
-                    fetchProfileData()
-                ]);
+                fetchProfileData();
             } catch (error) {
                 setError(error.message);
                 console.error('Error:', error);
-            } finally {
-                setLoading(false);
             }
         };
-
             fetchData();
     }, []);
-
-    useEffect(() => {
-        if (totalChallenges !== null) {
-            setProfile(prev => ({
-                ...prev,
-                totalChallenges
-            }));
-        }
-    }, [totalChallenges]);
 
     const handleSaveEmail = async () => {
         try {
@@ -189,7 +173,7 @@ export default function ProfilePage() {
 
     return (
         <>
-            {loading && <Loading />}
+            {overviewLoading && <Loading />}
 
             {/* Background dengan gradient subtle */}
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 py-12 px-4">
@@ -210,7 +194,7 @@ export default function ProfilePage() {
                                 <User className="w-16 h-16" />
                             </div>
                             <h2 className="text-3xl font-bold text-white mt-6">{profile.name}</h2>
-                            <p className="text-indigo-200 mt-2">Member since {new Date(profile.createdAt || Date.now()).toLocaleDateString()}</p>
+                            <p className="text-indigo-200 mt-2">Acitve since {profile.timestamps ? new Date(profile.timestamps).toLocaleDateString() : 'N/A'}</p>
                         </div>
 
                         {/* Profile Content */}
@@ -225,16 +209,16 @@ export default function ProfilePage() {
                                         <div>
                                             <p className="text-indigo-200 text-sm font-medium">Total Challenges</p>
                                             <p className="text-4xl font-extrabold text-white">
-                                                {profile.totalChallenges || 0}
+                                                {overview.totalChallenges || 0}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {error && (
+                            {overviewError || error && (
                                 <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl text-sm">
-                                    {error}
+                                    {overviewError || error}
                                 </div>
                             )}
 

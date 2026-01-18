@@ -6,7 +6,7 @@ export default function Provider({ children }) {
     const [qc] = useState(() => new QueryClient({
         defaultOptions: {
         queries: {
-            staleTime: 1000 * 30, 
+            staleTime: 1000 * 60, 
             cacheTime: 1000 * 60 * 5,
             retry: 1
         }

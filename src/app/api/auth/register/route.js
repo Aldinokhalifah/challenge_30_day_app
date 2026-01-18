@@ -19,6 +19,7 @@ export async function POST(req) {
 
         const lastUser = await User.findOne().sort({customId: -1});
         const customId = lastUser ? lastUser.customId + 1 : 1;
+        const timestamps = new Date().toISOString();
 
          // Validasi input
         if (!name || !email || !password) {
@@ -41,7 +42,8 @@ export async function POST(req) {
             customId,
             name,
             email,
-            password
+            password,
+            timestamps
         })
 
         await newUser.save();
@@ -51,7 +53,8 @@ export async function POST(req) {
             data: {
                 id: newUser.customId,
                 name: newUser.name,
-                email: newUser.email
+                email: newUser.email,
+                timestamps: newUser.createdAt 
             }
         }, { status: 201 });
     } catch (error) {

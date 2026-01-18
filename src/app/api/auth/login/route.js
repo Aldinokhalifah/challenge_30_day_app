@@ -39,7 +39,8 @@ export async function POST(req) {
             id: findUser.customId,
             name: findUser.name,
             email: findUser.email,
-            timezone: findUser.timezone
+            timezone: findUser.timezone,
+            timestamps: findUser.createdAt 
         }
         });
 

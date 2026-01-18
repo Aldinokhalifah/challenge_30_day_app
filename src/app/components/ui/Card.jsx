@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
-    const { customId, title, description, progress, completedDays, startDate } = data;
+    const { customId, title, description, progress, completedDays, onGoingDays, startDate } = data;
     const [menuOpen, setMenuOpen] = useState(false);
     const progressPercentage = (completedDays / 30) * 100;
     const [isPublic, setIsPublic] = useState(Boolean(data?.isPublic));
@@ -217,7 +217,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                         
                         {/* Center text */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-white font-bold text-sm">{completedDays}</span>
+                            <span className="text-white font-bold text-sm">{onGoingDays}</span>
                             <span className="text-gray-400 text-xs">days</span>
                         </div>
 
@@ -256,7 +256,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                             <span className="text-lg">🎯</span>
                         </div>
                         <div>
-                            <div className="text-white font-semibold text-sm">Day {completedDays}</div>
+                            <div className="text-white font-semibold text-sm">Day {onGoingDays}</div>
                             <div className="text-gray-400 text-xs">of 30 days</div>
                         </div>
                     </div>

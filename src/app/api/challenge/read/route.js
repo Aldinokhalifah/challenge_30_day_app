@@ -17,6 +17,7 @@ export async function GET(req) {
     const challengesResponse = challenges.map(challenge => {
         const completedDays = challenge.logs.filter(log => log.status === 'completed').length;
         const progress = completedDays / 30;
+        const onGoingDays = challenge.logs.filter(log => log.status !== 'pending').length;
 
         return {
             id: challenge._id,
@@ -27,6 +28,7 @@ export async function GET(req) {
             createdAt: challenge.createdAt,
             progress,
             completedDays,
+            onGoingDays,
             isPublic: challenge.isPublic,
         };
     });

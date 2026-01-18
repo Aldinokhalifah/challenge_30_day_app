@@ -23,8 +23,14 @@ export async function DELETE(req, { params }) {
 
     await user.deleteOne();
 
-    return NextResponse.json(
+    const response =  NextResponse.json(
         { message: `User ${userName} deleted successfully` },
         { status: 200 }
     );
+
+    // hapus cookie token & last activity
+    response.cookies.delete('token');
+    response.cookies.delete('lastActivity');
+
+    return response;
 }
