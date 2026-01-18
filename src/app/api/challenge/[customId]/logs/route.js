@@ -5,65 +5,75 @@ import User from "../../../../../../models/User";
 import { toZonedTime } from "date-fns-tz";
 import { format } from "date-fns";
 
-export async function GET(req, {params}) {
-    const userId = await verifyToken(req);
-    const {customId} = await params;
+export async function GET(req, { params }) {
+    try {
+        const userId = await verifyToken(req);
+        const { customId } = await params;
 
-    if(!userId) {
-        return NextResponse.json(
-            {message: 'Unauthorized'},
-            {status: 401}
-        )
+        if (!userId) {
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+        }
+
+        const challengeId = parseInt(customId);
+
+        // 1. Optimasi Database: Ambil field yang diperlukan saja & gunakan .lean()
+        const challenge = await Challenge.findOne({ customId: challengeId, userId })
+            .select("logs lastFilled")
+            .lean();
+
+        if (!challenge) {
+            return NextResponse.json({ message: 'Challenge tidak ditemukan' }, { status: 404 });
+        }
+
+        // 2. Ambil timezone user (hanya field timezone)
+        const user = await User.findById(userId).select("timezone").lean();
+        const userTimezone = user?.timezone || "UTC";
+
+        // Logika Waktu
+        const now = new Date();
+        const zonedNow = toZonedTime(now, userTimezone);
+        const todayKey = format(zonedNow, "yyyy-MM-dd");
+
+        let canFillToday, filledDayToday;
+
+        if (challenge.lastFilled?.dateISO === todayKey) {
+            canFillToday = false;
+            filledDayToday = challenge.lastFilled.day;
+        } else {
+            canFillToday = true;
+            filledDayToday = null;
+        }
+
+        // 3. Optimasi Kalkulasi Logs
+        const logs = challenge.logs || [];
+        
+        // Cari log terakhir yang tidak pending tanpa perlu filter seluruh array dulu
+        // Kita bisa langsung cari dari belakang untuk efisiensi
+        const lastFilledLog = [...logs]
+            .reverse()
+            .find(log => log.status !== 'pending');
+
+        const nextDayToFill = lastFilledLog ? lastFilledLog.day + 1 : 1;
+
+        // Map data untuk dikirim ke frontend
+        const formattedLogs = logs.map(log => ({
+            day: log.day,
+            status: log.status,
+            note: log.note,
+            date: log.date,
+            filledAt: log.filledAt
+        }));
+
+        return NextResponse.json({
+            message: 'Logs berhasil diambil',
+            logs: formattedLogs,
+            canFillToday,
+            filledDayToday,
+            nextDayToFill
+        }, { status: 200 });
+
+    } catch (error) {
+        console.error("Error Fetching Logs:", error);
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
     }
-    
-    const challengeId = parseInt(customId);
-    const challenge = await Challenge.findOne({customId: challengeId, userId});
-
-    if(!challenge) {
-        return NextResponse.json(
-            {message: 'Challenge tidak ditemukan'},
-            {status: 404}
-        )
-    }
-
-    const user = await User.findById(userId);
-    const userTimezone = user?.timezone || "UTC";
-
-    const now = new Date();
-    const zonedNow = toZonedTime(now, userTimezone);
-    const todayKey = format(zonedNow, "yyyy-MM-dd");
-
-    let canFillToday, filledDayToday;
-    
-    if(challenge.lastFilled?.dateISO === todayKey) {
-        canFillToday = false;
-        filledDayToday = challenge.lastFilled.day;
-    } else {
-        canFillToday = true;
-        filledDayToday = null;
-    }
-
-    // Hitung next day yang harus diisi
-    const filledLogs = challenge.logs
-        .filter(log => log.status !== 'pending')
-        .sort((a, b) => a.day - b.day);
-    
-    const lastFilledLog = filledLogs[filledLogs.length - 1];
-    const nextDayToFill = lastFilledLog ? lastFilledLog.day + 1 : 1;
-
-    const logs = challenge.logs.map(log => ({
-        day: log.day,
-        status: log.status,
-        note: log.note,
-        date: log.date,
-        filledAt: log.filledAt
-    }));
-
-    return NextResponse.json({
-        message: 'Logs berhasil diambil',
-        logs: logs,
-        canFillToday: canFillToday,
-        filledDayToday: filledDayToday,
-        nextDayToFill: nextDayToFill 
-    }, {status: 200})
 }

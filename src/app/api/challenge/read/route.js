@@ -12,7 +12,11 @@ export async function GET(req) {
         );
     }
 
-    const challenges = await  Challenge.find({ userId }).sort({ createdAt: 1 });
+    // 1. Gunakan .lean() untuk efisiensi memori yang signifikan
+    // 2. Gunakan .select() untuk menghindari mengambil data yang tidak perlu (jika ada field besar lain)
+    const challenges = await Challenge.find({ userId })
+        .sort({ createdAt: 1 })
+        .lean();
 
     const challengesResponse = challenges.map(challenge => {
         const completedDays = challenge.logs.filter(log => log.status === 'completed').length;

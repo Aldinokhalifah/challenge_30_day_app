@@ -7,32 +7,40 @@ export async function GET(req) {
         const userId = await verifyToken(req);
 
         if(!userId) {
-            return NextResponse.json(
-                {message: 'Unauthorized'},
-                {status: 401}
-            )
+            return NextResponse.json({message: 'Unauthorized'}, {status: 401})
         }
 
-        const challenges = await Challenge.find({userId: userId});
+        // 1. Gunakan .lean() dan hanya pilih field 'logs'
+        // Ini akan menghemat penggunaan RAM server secara signifikan
+        const challenges = await Challenge.find({userId: userId})
+            .select("logs")
+            .lean();
 
         if (!challenges.length) {
             return NextResponse.json({ 
-                message: "Belum ada challenge",
                 totalChallenges: 0,
                 completedChallenges: 0,
                 activeChallenges: 0,
-                overallProgress: 0
+                overallProgress: 0,
+                completedDays: 0,
+                totalStreak: 0
             }, { status: 200 });
         }
 
+        // 2. Kalkulasi Data
         const challengesWithProgress = challenges.map(challenge => {
-            const completedDays = challenge.logs.filter(log => log.status === 'completed').length;
-            const progress = Math.round((completedDays / 30) * 100); // Convert ke persentase
+            const logs = challenge.logs || [];
+            
+            // Gunakan satu loop untuk mendapatkan semua data
+            let completedDays = 0;
+            let longestStreak = 0;
+            let currentStreak = 0;
+            let totalStreak = 0;
+            let streakCount = 0;
 
-            let longestStreak = 0, currentStreak = 0, totalStreak = 0, streakCount = 0;
-
-            challenge.logs.forEach(log => {
+            logs.forEach(log => {
                 if(log.status === 'completed') {
+                    completedDays++;
                     currentStreak++;
                     if (currentStreak > longestStreak) longestStreak = currentStreak;
                 } else {
@@ -43,50 +51,46 @@ export async function GET(req) {
                     currentStreak = 0;
                 }
             });
+
+            // Handle sisa streak di akhir array
+            if (currentStreak > 0) {
+                totalStreak += currentStreak;
+            }
             
+            const progress = Math.round((completedDays / 30) * 100);
+
             return {
                 progress,
                 totalStreak,
-                longestStreak,
                 completedDays
             };
         });
 
-        console.log("📊 Challenges progress:", challengesWithProgress);
-
-        // Hitung stats
+        // 3. Agregasi Stats Final
         const totalChallenges = challengesWithProgress.length;
-        const completedChallenges = challengesWithProgress.filter(c => c.progress >= 100).length;
+        const completedChallenges = challengesWithProgress.filter(c => c.progress == 100).length;
         const activeChallenges = totalChallenges - completedChallenges;
-        const completedDays = challengesWithProgress.reduce((acc, current) => acc + current.completedDays, 0);
-        const totalStreak = challengesWithProgress.reduce((acc, current) => acc + current.totalStreak, 0);
         
-        let overallProgress = 0;
-        if (totalChallenges > 0) {
-            const sumProgress = challengesWithProgress.reduce((sum, c) => sum + c.progress, 0);
-            overallProgress = Math.round(sumProgress / totalChallenges);
-            overallProgress = Math.min(overallProgress, 100);
-            
-            console.log("📊 Calculation:", {
-                totalChallenges,
-                completedChallenges,
-                activeChallenges,
-                overallProgress,
-                completedDays,
-                totalStreak,
-            });
-        }
+        // Gunakan reduce sekali saja untuk mengambil semua sum
+        const totals = challengesWithProgress.reduce((acc, current) => {
+            acc.days += current.completedDays;
+            acc.streak += current.totalStreak;
+            acc.progressSum += current.progress;
+            return acc;
+        }, { days: 0, streak: 0, progressSum: 0 });
+
+        const overallProgress = Math.min(Math.round(totals.progressSum / totalChallenges), 100);
 
         return NextResponse.json({
             totalChallenges,
             completedChallenges,
             activeChallenges,
             overallProgress,
-            completedDays,
-            totalStreak,
+            completedDays: totals.days,
+            totalStreak: totals.streak,
         });
     } catch (error) {
         console.error("❌ Error overview stats:", error.message);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
