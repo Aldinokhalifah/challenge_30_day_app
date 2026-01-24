@@ -7,14 +7,15 @@ import { Menu } from 'lucide-react';
 import Sidebar from "@/app/components/ui/sidebar";
 import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChallengeSection";
 import Loading from "@/app/components/ui/loading";
-import { useRouter } from "next/navigation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchChallenges } from "@/app/lib/api";
+import { readCache } from "@/app/lib/localCache";
 
 function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [challengeStats, setChallengeStats] = useState([]);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
+    const [userData, setUserData] = useState(null);
+    const qc = useQueryClient();
+    const initialChallenges = readCache(`challenges-${userData?.id}`);
     
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -33,42 +34,35 @@ function Challenges() {
             window.removeEventListener("click", handleActivity);
         };
     }, []);
-    
-    
-    const fetchChallengeStats = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch('/api/challenge/read', {
-                credentials: 'include'
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const data = await response.json();
-            setChallengeStats(data.challenges);
-        } catch (error) {
-            console.error('Error fetching challenge stats:', error);
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Fungsi untuk fetch ulang data
-    const reloadChallenges = async () => {
-        const response = await fetch('/api/challenge/read', {
-            credentials: 'include'
-        });
-
-        const data = await response.json();
-        setChallengeStats(data.challenges);
-    };
 
     useEffect(() => {
-        fetchChallengeStats();
+        const storedUserData = localStorage.getItem('userData');
+        if (storedUserData) {
+            try {
+                setUserData(JSON.parse(storedUserData));
+            } catch (error) {
+                console.error('Error parsing userData:', error);
+            }
+        }
     }, []);
+    
+    const {
+        data: challenges,
+        isLoading: challengesLoading,
+        isFetching: challengesFetching,
+        error: challengesError,
+    } = useQuery({
+        queryKey: ["challenges"],
+        queryFn: fetchChallenges,
+        initialData: initialChallenges || undefined,
+        staleTime: 1000 * 60,
+    });
+
+    // Fungsi untuk fetch ulang data
+    const reloadAll = () => {
+        qc.invalidateQueries({ queryKey: ['challenges'] })
+    };
+
     return(
             <AnimatedGradientBg>
                 <div className="min-h-screen text-white">
@@ -90,12 +84,15 @@ function Challenges() {
 
                             {/* Content */}
                             <main className="flex-1 p-4 ">
-                                {loading ? (
+                                {challengesError && (
+                                    <h1>{challengesError.message}</h1>
+                                )}
+                                {challengesLoading ? (
                                     <Loading />
                                 ): (
                                     <ActiveChallengesSection
-                                        challengeStats={challengeStats}
-                                        reloadChallenges={reloadChallenges} // kirim callback ke child
+                                        challengeStats={challenges}
+                                        reloadChallenges={reloadAll} // kirim callback ke child
                                     />
                                 )}
                             </main>

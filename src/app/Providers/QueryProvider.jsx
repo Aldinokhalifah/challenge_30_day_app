@@ -7,7 +7,7 @@ export default function Provider({ children }) {
         defaultOptions: {
         queries: {
             staleTime: 1000 * 60, 
-            cacheTime: 1000 * 60 * 5,
+            gcTime: 1000 * 60 * 5,
             retry: 1
         }
         }

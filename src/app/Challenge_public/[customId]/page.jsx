@@ -18,8 +18,8 @@ function ChallengeDetailPagePublic() {
     } = useQuery({
         queryKey: ['challengePublic', customId],
         queryFn: () => fetchChallengePublic(customId),
-        staleTime: 1000 * 60,
-        gcTime: 1000 * 60 * 5, 
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
         enabled: !!customId 
     });
 
@@ -30,12 +30,14 @@ function ChallengeDetailPagePublic() {
     } = useQuery({
         queryKey: ['challengeStatsPublic', customId],
         queryFn: () => fetchStatsChallengePublic(customId),
-        staleTime: 1000 * 60,
-        gcTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 *10,
         enabled: !!customId
     });
 
-    if (challengeLoading || statisticLoading) return <Loading />;
+    if ((challengeLoading && !challenge) || (statisticLoading && !statistic)) {
+        return <Loading />;
+    }
     if (challengeError) return <div>Error: {challengeError.message}</div>;
     if (statisticError) return <div>Error: {statisticError.message}</div>;
     if (!challenge) return <div>Challenges Not Found</div>;

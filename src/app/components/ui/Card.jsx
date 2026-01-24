@@ -1,14 +1,16 @@
 'use client';
 
-import { MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical} from "lucide-react";
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchChallengePublic } from "@/app/lib/api";
 
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
-    const { customId, title, description, progress, completedDays, onGoingDays, startDate } = data;
+    const { customId, title, description, progress, completedDays, onGoingDays, startDate, isPublic } = data;
     const [menuOpen, setMenuOpen] = useState(false);
     const progressPercentage = (completedDays / 30) * 100;
-    const [isPublic, setIsPublic] = useState(Boolean(data?.isPublic));
+    const queryClient = useQueryClient();
     
     const getProgressGradient = (progress) => {
         if (progress >= 80) return 'from-emerald-400 via-green-500 to-teal-600';
@@ -59,28 +61,37 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
         }
     }, [onDeleted]); 
 
-    const handleTogglePublic = useCallback(async (customId, newStatus) => {
-        try {
+    const toggleMutation = useMutation({
+        mutationFn: async ({ customId, newStatus }) => {
             const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
                 method: 'PUT',
-                credentials: 'include',
-                body: JSON.stringify({ isPublic: newStatus })
+                body: JSON.stringify({ isPublic: newStatus }),
+                headers: { 'Content-Type': 'application/json' }
             });
+            if (!response.ok) throw new Error("Gagal update status");
+            return response.json();
+        },
+        onSuccess: (resData, variables) => {
+            // 1. Beritahu React Query bahwa data challenge list sudah "basi"
+            // Ganti 'challenges' sesuai dengan queryKey yang kamu pakai di halaman Dashboard
+            queryClient.invalidateQueries({ queryKey: ['challenges'] });
 
-            if(!response.ok) {
-                const errText = await response.text();
-                throw new Error(errText || "Failed to update challenge visibility");
+            // 2. Jika diubah jadi Public, kita PREFETCH data publiknya
+            if (variables.newStatus) {
+                console.log("Prefetching challenge public...");
+                queryClient.prefetchQuery({
+                    queryKey: ['challengePublic', customId],
+                    queryFn: () => fetchChallengePublic(customId),
+                    staleTime: 1000 * 60 * 5,
+                });
             }
-
-            const resData = await response.json();
-            console.log("Visibility updated: ", resData.message);
-
-            setIsPublic(Boolean(resData?.challenge?.isPublic ?? newStatus));
-            if (onDeleted) onDeleted();
-        } catch (error) {
-            console.error(error.message);
+            
+            setMenuOpen(false);
+        },
+        onError: (error) => {
+            alert("Error: " + error.message);
         }
-    }, [onDeleted]);
+    });
 
     return (
         <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
@@ -122,57 +133,38 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                         </button>
                         {/* Dropdown menu */}
                         {menuOpen && (
-                            <div className="absolute right-0 mt-2 w-40 bg-slate-900 border border-white/10 rounded-xl shadow-lg z-20">
-                                <button
-                                    className="block w-full text-left px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white rounded-t-xl transition"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        if (onEdit) onEdit(data); // kirim data challenge ke parent
-                                    }}
+                            <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                                <button onClick={() => { onEdit(data); setMenuOpen(false); }} className="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/5">Edit Challenge</button>
+                                
+                                <Link href={`/Challenges/${customId}`} className="block px-4 py-3 text-sm text-gray-300 hover:bg-white/5">View Details</Link>
+
+                                {/* TOMBOL TOGGLE PUBLIC */}
+                                <button 
+                                    disabled={toggleMutation.isPending}
+                                    // 2. Sekarang kita gunakan !isPublic (dari props data)
+                                    // Karena data berasal dari React Query, saat invalidateQueries dipanggil,
+                                    // props ini akan otomatis terupdate dengan nilai terbaru dari server.
+                                    onClick={() => toggleMutation.mutate({ customId, newStatus: !isPublic })}
+                                    className={`w-full text-left px-4 py-3 text-sm font-medium ${isPublic ? 'text-yellow-400' : 'text-green-400'} hover:bg-white/5`}
                                 >
-                                    Edit
+                                    {toggleMutation.isPending ? "Updating..." : (isPublic ? "🔒 Make Private" : "🌍 Make Public")}
                                 </button>
-                                <Link
-                                    href={`/Challenges/${customId}`}
-                                    className="block px-4 py-2 text-sm text-indigo-300 hover:bg-indigo-600/20 hover:text-white transition"
-                                    onClick={() => setMenuOpen(false)}
-                                >
-                                    More Detail
-                                </Link>
-                                <button
-                                    className={`block w-full text-left px-4 py-2 text-sm ${
-                                        data.isPublic
-                                        ? "text-yellow-400 hover:bg-yellow-600/20 hover:text-white"
-                                        : "text-green-400 hover:bg-green-600/20 hover:text-white"
-                                    } transition`}
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        handleTogglePublic(customId, !data.isPublic);
-                                    }}
-                                    >
-                                    {data.isPublic ? "Make Private" : "Make Public"}
-                                </button>
+
+                                {/* TOMBOL COPY LINK (Hanya muncul jika public) */}
                                 {isPublic && (
-                                    <button
+                                    <button 
                                         onClick={() => {
-                                        navigator.clipboard.writeText(`${window.location.origin}/Challenge_public/${customId}`);
-                                        alert("Public URL copied to clipboard!");
+                                            navigator.clipboard.writeText(`${window.location.origin}/Challenge_public/${customId}`);
+                                            alert("Link copied!");
+                                            setMenuOpen(false);
                                         }}
-                                        className="w-full text-left px-4 py-2 text-sm text-indigo-400 hover:bg-indigo-600/20 transition"
+                                        className="w-full text-left px-4 py-3 text-sm text-indigo-400 hover:bg-white/5"
                                     >
-                                        Share Public Link
+                                        🔗 Copy Public Link
                                     </button>
                                 )}
 
-                                <button
-                                    className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-600/20 hover:text-white rounded-b-xl transition"
-                                    onClick={() => {
-                                        setMenuOpen(false);
-                                        handleDelete(customId);
-                                    }}
-                                >
-                                    Delete
-                                </button>
+                                <button onClick={() => handleDelete(customId)} className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-400/10">Delete</button>
                             </div>
                         )}
                     </div>

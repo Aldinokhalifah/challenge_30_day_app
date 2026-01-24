@@ -58,7 +58,7 @@ function HomePage() {
         queryKey: ['challenges'],
         queryFn: fetchChallenges,
         initialData: initialChallenges || undefined,
-        staleTime: 1000 * 30,
+        staleTime: 1000 * 60,
     });
 
     const {
@@ -68,7 +68,7 @@ function HomePage() {
     } = useQuery({
         queryKey: ['overviewStats'],
         queryFn: fetchOverviewStats,
-        staleTime: 1000 * 10,
+        staleTime: 1000 * 60,
     });
 
     useEffect(() => {
