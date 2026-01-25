@@ -6,7 +6,6 @@ import { Menu } from 'lucide-react';
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchChallenges, fetchOverviewStats } from "@/app/lib/api";
-import { readCache, writeCache } from "@/app/lib/localCache";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
@@ -18,7 +17,6 @@ function HomePage() {
     const [userData, setUserData] = useState(null);
     const router = useRouter();
     const qc = useQueryClient();
-    const initialChallenges = readCache(`challenges-${userData?.id}`);
 
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -57,8 +55,8 @@ function HomePage() {
     } = useQuery({
         queryKey: ['challenges'],
         queryFn: fetchChallenges,
-        initialData: initialChallenges || undefined,
-        staleTime: 1000 * 60,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 20
     });
 
     const {
@@ -68,16 +66,10 @@ function HomePage() {
     } = useQuery({
         queryKey: ['overviewStats'],
         queryFn: fetchOverviewStats,
-        staleTime: 1000 * 60,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 20
     });
 
-    useEffect(() => {
-        if (challenges) writeCache(`challenges-${userData?.id}`, challenges);
-    }, [challenges]);
-
-    useEffect(() => {
-        if (overview) writeCache(`overviews-${userData?.id}`, overview);
-    }, [overview]);
 
     const reloadAll = async () => {
         await Promise.all([

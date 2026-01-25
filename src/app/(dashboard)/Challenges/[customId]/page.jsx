@@ -16,20 +16,20 @@ function ChallengeDetailPage() {
             {
                 queryKey: ['challenge', customId],
                 queryFn: () => fetchChallengeDetail(customId),
-                staleTime: 1000 * 60,
-                gcTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
+                gcTime: 1000 * 60 * 20,
             },
             {
                 queryKey: ['challenge-stats', customId],
                 queryFn: () => fetchOverviewStatsDetail(customId),
-                staleTime: 1000 * 60,
-                gcTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
+                gcTime: 1000 * 60 * 20,
             },
             {
                 queryKey: ['challenge-logs', customId],
                 queryFn: () => fetchChallengeLogs(customId),
-                staleTime: 1000 * 60,
-                gcTime: 1000 * 60 * 5,
+                staleTime: 1000 * 60 * 5,
+                gcTime: 1000 * 60 * 20,
             }
         ]
     });

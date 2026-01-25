@@ -23,8 +23,6 @@ export default function ProfilePage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
     const qc = useQueryClient();
-    const userData = localStorage.getItem('userData');
-    const initialChallenges = readCache(`overview-${userData?.id}`);
 
     const {
         data: overview,
@@ -33,8 +31,8 @@ export default function ProfilePage() {
     } = useQuery({
         queryKey: ['overviewStats'],
         queryFn: fetchOverviewStats,
-        initialData: initialChallenges || 0,
-        staleTime: 1000 * 10,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 20
     });
 
     const fetchProfileData = async () => {

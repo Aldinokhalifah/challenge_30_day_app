@@ -15,7 +15,6 @@ function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userData, setUserData] = useState(null);
     const qc = useQueryClient();
-    const initialChallenges = readCache(`challenges-${userData?.id}`);
     
     // Track user activity untuk inaktivitas check
     useEffect(() => {
@@ -54,8 +53,8 @@ function Challenges() {
     } = useQuery({
         queryKey: ["challenges"],
         queryFn: fetchChallenges,
-        initialData: initialChallenges || undefined,
-        staleTime: 1000 * 60,
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 20
     });
 
     // Fungsi untuk fetch ulang data

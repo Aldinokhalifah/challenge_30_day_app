@@ -49,14 +49,6 @@ export default function Sidebar({ isOpen, onClose }) {
       //Hapus data autentikasi & aktivitas
       localStorage.removeItem('userData');
 
-      //Hapus cache manual
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('challenges-') || key.startsWith('overviews-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      
       setIsLoggedIn(false);
       router.push('/Login');
     }

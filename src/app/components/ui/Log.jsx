@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Clock, XCircle, CheckCircle, Calendar, Sparkles, Save, FileText, Lock } from "lucide-react";
 import ReminderLog from "./ReminderLog";
 import Loading from "./loading";
@@ -8,42 +8,11 @@ import { fetchChallengeLogs } from "@/app/lib/api";
 
 export default function LogCard() {
     const { customId } = useParams();
-    // const [logs, setLogs] = useState([]);
-    // const [updatingLog, setUpdatingLog] = useState(null);
     const [showConfirmation, setShowConfirmation] = useState(null);
     const [editingLog, setEditingLog] = useState(null);
     const [noteInput, setNoteInput] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");    
-    // const [nextDayToFill, setNextDayToFill] = useState(1);
-    // const [canFillToday, setCanFillToday] = useState(true);
-    // const [filledDayToday, setFilledDayToday] = useState(null);
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [error, setError] = useState('');
     const queryClient = useQueryClient();
-
-    // const reloadChallenges = useCallback(async () => {
-    //     try {
-    //         setIsLoading(true);
-    //         const res = await fetch(`/api/challenge/${customId}/logs`, {
-    //             credentials: 'include',
-    //         });
-
-    //         if (!res.ok) throw new Error("Failed to fetch challenge");
-            
-    //         const data = await res.json();
-            
-    //         // Batch state updates
-    //         setLogs(data.logs);
-    //         setNextDayToFill(data.nextDayToFill);
-    //         setCanFillToday(data.canFillToday);
-    //         setFilledDayToday(data.filledDayToday);
-    //     } catch (error) {
-    //         console.error('Error fetching logs:', error);
-    //         setError(error.message);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // }, [customId]);
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['challenge-logs', customId],
@@ -51,10 +20,6 @@ export default function LogCard() {
     });
 
     const { logs = [], nextDayToFill, canFillToday, filledDayToday } = data || {};
-
-    // useEffect(() => {
-    //     if(customId) reloadChallenges();
-    // }, [customId])
 
     const updateLogMutation = useMutation({
         mutationFn: async ({ day, status, note }) => {
@@ -70,6 +35,9 @@ export default function LogCard() {
             // REFRESH DATA! Ini otomatis menggantikan reloadChallenges()
             queryClient.invalidateQueries({ queryKey: ['challenge-logs', customId] });
             queryClient.invalidateQueries({ queryKey: ['challenge-stats', customId] });
+            queryClient.invalidateQueries({ queryKey: ['challenge', customId] });
+            queryClient.invalidateQueries({ queryKey: ['challenges'] });
+            queryClient.invalidateQueries({ queryKey: ['overviewStats'] });
 
             setEditingLog(null);
             setNoteInput("");
@@ -99,6 +67,7 @@ export default function LogCard() {
             updateLogMutation.mutate({ day, status: selectedStatus, note: noteInput });
         } catch (error) {
             console.log(error.message);
+            alert(error.message);
             setEditingLog(null);
             setNoteInput('');
             setSelectedStatus('');
