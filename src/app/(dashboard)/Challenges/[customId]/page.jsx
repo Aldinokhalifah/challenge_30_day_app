@@ -1,73 +1,54 @@
 'use client';
 
 import React from "react";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useParams } from "next/navigation";
 import ChallengeDetail from "../../../components/Challenges/Detail/page";
-import Loading from "../../../components/ui/loading";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { fetchChallengeDetail, fetchOverviewStatsDetail } from "@/app/lib/api";
 
 function ChallengeDetailPage() {
     const { customId } = useParams();
-    const [challenge, setChallenge] = useState(null);
-    const [statistic, setStatistic] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        async function fetchChallenge() {
-            try {
-                const [challengeRes, statsRes] = await Promise.all([
-                    fetch(`/api/challenge/${customId}`, {
-                        credentials: 'include'
-                    }),
-                    fetch(`/api/challenge/${customId}/statistic`, {
-                        credentials: 'include'
-                    })
-                ]);
-
-                if (!challengeRes.ok) throw new Error('Failed to fetch challenge');
-                if (!statsRes.ok) throw new Error('Failed to fetch statistics');
-
-                const [challengeData, statsData] = await Promise.all([
-                    challengeRes.json(),
-                    statsRes.json()
-                ]);
-
-                setChallenge(challengeData.challenge);
-                setStatistic(statsData.statistic);
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
+    const queryClient = useQueryClient();
+    
+    const [challengeQuery, statsQuery] = useQueries({
+        queries: [
+            {
+                queryKey: ['challenge', customId],
+                queryFn: () => fetchChallengeDetail(customId),
+                staleTime: 1000 * 60,
+                gcTime: 1000 * 60 * 5,
+            },
+            {
+                queryKey: ['challenge-stats', customId],
+                queryFn: () => fetchOverviewStatsDetail(customId),
+                staleTime: 1000 * 60,
+                gcTime: 1000 * 60 * 5,
+            },
+            {
+                queryKey: ['challenge-logs', customId],
+                queryFn: () => fetchChallengeLogs(customId),
+                staleTime: 1000 * 60,
+                gcTime: 1000 * 60 * 5,
             }
-        }
+        ]
+    });
 
-        fetchChallenge();
-    }, [customId]);
+    const challenge = challengeQuery.data;
+    const statistic = statsQuery.data;
 
-    const reloadChallenges = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await fetch(`/api/challenge/${customId}`, {
-                credentials: 'include'
-            });
-            
-            if (!res.ok) throw new Error('Failed to fetch challenge');
-            
-            const data = await res.json();
-            setChallenge(data.challenge);
-        } catch (err) {
-            console.error("Error reloading challenge:", err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
+    const isLoading = challengeQuery.isLoading || statsQuery.isLoading;
+    const isError = challengeQuery.isError || statsQuery.isError;
+    const errorMsg = challengeQuery.error?.message || statsQuery.error?.message;
+
+    const reloadChallenges = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['challenge', customId] });
+        queryClient.invalidateQueries({ queryKey: ['challenge-stats', customId] });
     }, [customId]);
 
 
-    if (error) return <div>Error: {error}</div>;
-    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic} loading={loading} />;
+    if (isError) return <div>Error: {errorMsg}</div>;
+    return <ChallengeDetail challenge={challenge} reloadChallenges={reloadChallenges} statistic={statistic} loading={isLoading} />;
 }
 
 export default React.memo(ChallengeDetailPage);

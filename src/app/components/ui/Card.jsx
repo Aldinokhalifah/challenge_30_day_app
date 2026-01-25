@@ -22,15 +22,8 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const getCardGlow = (progress) => {
         if (progress >= 80) return 'hover:shadow-emerald-500/30';
         if (progress >= 60) return 'hover:shadow-indigo-500/30';
-        if (progress >= 40) return 'hover:shadow-orange-500/30';
+        if (progress >= 40) return 'hover:shadow-amber-500/30';
         return 'hover:shadow-pink-500/30';
-    };
-
-    const getStatusIcon = (progress) => {
-        if (progress >= 80) return '🔥';
-        if (progress >= 60) return '⚡';
-        if (progress >= 40) return '💪';
-        return '🌱';
     };
 
     const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
@@ -94,7 +87,7 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
     });
 
     return (
-        <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progress)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
+        <div className={`group relative overflow-hidden bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-0 shadow-2xl ${getCardGlow(progressPercentage)} transition-all duration-700 transform hover:-translate-y-3 hover:scale-[1.03] cursor-pointer w-full`}>
             
             {/* Dynamic background pattern */}
             <div className="absolute inset-0 opacity-20">
@@ -109,7 +102,6 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
                         {/* Status badge */}
                         <div className="flex items-center gap-2">
                             <div className={`px-3 py-1 bg-gradient-to-r ${getProgressGradient(progressPercentage)} rounded-full flex items-center gap-2`}>
-                                <span className="text-white text-xs font-bold">{getStatusIcon(progressPercentage)}</span>
                                 <span className="text-white text-xs font-bold">{progressPercentage.toFixed(0)}%</span>
                             </div>
                             <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>

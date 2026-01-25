@@ -1,50 +1,85 @@
 import { useParams } from "next/navigation";
 import { useState, useCallback, useEffect } from "react";
-import { Clock, XCircle, CheckCircle, Calendar, Sparkles, Save, FileText, Lock, AlertCircle } from "lucide-react";
+import { Clock, XCircle, CheckCircle, Calendar, Sparkles, Save, FileText, Lock } from "lucide-react";
 import ReminderLog from "./ReminderLog";
 import Loading from "./loading";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchChallengeLogs } from "@/app/lib/api";
 
 export default function LogCard() {
     const { customId } = useParams();
-    const [logs, setLogs] = useState([]);
-    const [updatingLog, setUpdatingLog] = useState(null);
+    // const [logs, setLogs] = useState([]);
+    // const [updatingLog, setUpdatingLog] = useState(null);
     const [showConfirmation, setShowConfirmation] = useState(null);
     const [editingLog, setEditingLog] = useState(null);
     const [noteInput, setNoteInput] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");    
-    const [nextDayToFill, setNextDayToFill] = useState(1);
-    const [canFillToday, setCanFillToday] = useState(true);
-    const [filledDayToday, setFilledDayToday] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
+    // const [nextDayToFill, setNextDayToFill] = useState(1);
+    // const [canFillToday, setCanFillToday] = useState(true);
+    // const [filledDayToday, setFilledDayToday] = useState(null);
+    // const [isLoading, setIsLoading] = useState(false);
+    // const [error, setError] = useState('');
+    const queryClient = useQueryClient();
 
-    const reloadChallenges = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const res = await fetch(`/api/challenge/${customId}/logs`, {
+    // const reloadChallenges = useCallback(async () => {
+    //     try {
+    //         setIsLoading(true);
+    //         const res = await fetch(`/api/challenge/${customId}/logs`, {
+    //             credentials: 'include',
+    //         });
+
+    //         if (!res.ok) throw new Error("Failed to fetch challenge");
+            
+    //         const data = await res.json();
+            
+    //         // Batch state updates
+    //         setLogs(data.logs);
+    //         setNextDayToFill(data.nextDayToFill);
+    //         setCanFillToday(data.canFillToday);
+    //         setFilledDayToday(data.filledDayToday);
+    //     } catch (error) {
+    //         console.error('Error fetching logs:', error);
+    //         setError(error.message);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // }, [customId]);
+
+    const { data, isLoading, isError } = useQuery({
+        queryKey: ['challenge-logs', customId],
+        queryFn: () => fetchChallengeLogs(customId),
+    });
+
+    const { logs = [], nextDayToFill, canFillToday, filledDayToday } = data || {};
+
+    // useEffect(() => {
+    //     if(customId) reloadChallenges();
+    // }, [customId])
+
+    const updateLogMutation = useMutation({
+        mutationFn: async ({ day, status, note }) => {
+            const res = await fetch(`/api/challenge/${customId}/logs/${day}`, {
+                method: "PUT",
                 credentials: 'include',
+                body: JSON.stringify({ status, note }),
             });
+            if (!res.ok) throw new Error("Failed to update log");
+            return res.json();
+        },
+        onSuccess: (resData, variables) => {
+            // REFRESH DATA! Ini otomatis menggantikan reloadChallenges()
+            queryClient.invalidateQueries({ queryKey: ['challenge-logs', customId] });
+            queryClient.invalidateQueries({ queryKey: ['challenge-stats', customId] });
 
-            if (!res.ok) throw new Error("Failed to fetch challenge");
-            
-            const data = await res.json();
-            
-            // Batch state updates
-            setLogs(data.logs);
-            setNextDayToFill(data.nextDayToFill);
-            setCanFillToday(data.canFillToday);
-            setFilledDayToday(data.filledDayToday);
-        } catch (error) {
-            console.error('Error fetching logs:', error);
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [customId]);
-
-    useEffect(() => {
-        if(customId) reloadChallenges();
-    }, [customId])
+            setEditingLog(null);
+            setNoteInput("");
+            if (variables.status === "completed") {
+                setShowConfirmation(variables.day);
+                setTimeout(() => setShowConfirmation(null), 3000);
+            }
+        },
+        onError: (err) => alert(err.message)
+    });
 
     const handleEditLog = useCallback((log) => {
         setEditingLog(log.day);
@@ -58,50 +93,17 @@ export default function LogCard() {
         setSelectedStatus("");
     }, []); 
 
-    const handleSaveLog = useCallback(async (days) => {
-        if (!noteInput.trim()) {
-            alert("Please add a note before saving");
-            return;
-        }
-
-        setUpdatingLog(days);
-
+    const handleSaveLog = useCallback(async (day) => {
         try {
-            const res = await fetch(`/api/challenge/${customId}/logs/${days}`, {
-                method: "PUT",
-                credentials: 'include',
-                body: JSON.stringify({
-                    status: selectedStatus,
-                    note: noteInput,
-                }),
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || "Failed to update log");
-            }
-
-            const data = await res.json();
-
-            await reloadChallenges();
-
+            if (!noteInput.trim()) return alert("Please add a note");
+            updateLogMutation.mutate({ day, status: selectedStatus, note: noteInput });
+        } catch (error) {
+            console.log(error.message);
             setEditingLog(null);
-            setNoteInput("");
-            setSelectedStatus("");
-
-            if (selectedStatus === "completed") {
-                setShowConfirmation(days);
-                setTimeout(() => setShowConfirmation(null), 3000);
-            }
-        } catch (err) {
-            console.error(err);
-            alert(err.message);
-            setSelectedStatus('pending');
             setNoteInput('');
-        } finally {
-            setUpdatingLog(null);
+            setSelectedStatus('');
         }
-    }, [customId, noteInput, selectedStatus, reloadChallenges]);
+    }, [noteInput, selectedStatus, updateLogMutation]);
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -149,7 +151,7 @@ export default function LogCard() {
                 <ReminderLog  filledDayToday={filledDayToday}/>
             )}
 
-            {error && (
+            {isError && (
                 <h1 className="text-red-900 text-center">Logs Not Found</h1>
             )}
 
@@ -287,10 +289,10 @@ export default function LogCard() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => handleSaveLog(log.day)}
-                                                disabled={updatingLog === log.day}
+                                                disabled={updateLogMutation.isPending && updateLogMutation.variables?.day === log.day}
                                                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/30"
                                             >
-                                                {updatingLog === log.day ? (
+                                                {updateLogMutation.isPending && updateLogMutation.variables?.day === log.day ? (
                                                     <>
                                                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                                         <span>Saving...</span>
@@ -304,7 +306,7 @@ export default function LogCard() {
                                             </button>
                                             <button
                                                 onClick={handleCancelEdit}
-                                                disabled={updatingLog === log.day}
+                                                disabled={updateLogMutation.isPending && updateLogMutation.variables?.day === log.day}
                                                 className="px-4 py-3 bg-slate-700/50 text-gray-300 font-semibold rounded-xl hover:bg-slate-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 Cancel

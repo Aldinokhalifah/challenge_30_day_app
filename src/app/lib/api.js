@@ -12,7 +12,31 @@ export async function fetchOverviewStats() {
     return res.json();
 }
 
+// CHALLENGE HANDGLE TOGGLE PUBLIC
+
+// CHALLENGES DETAIL
+export async function fetchChallengeDetail(customId) {
+    const res = await fetch(`/api/challenge/${customId}`, {credentials: 'include'});
+    if (!res.ok) throw new Error('Failed to fetch challenge');
+    const json = await res.json();
+    return json.challenge;
+}
+
+export async function fetchOverviewStatsDetail(customId) {
+    const res = await fetch(`/api/challenge/${customId}/statistic`, {credentials: 'include'});
+    if (!res.ok) throw new Error('Failed to fetch overview');
+    const json = await res.json();
+    return json.statistic;
+}
+
 // LOGS
+export async function fetchChallengeLogs(customId) {
+    const res = await fetch(`/api/challenge/${customId}/logs`, { 
+        credentials: 'include' 
+    });
+    if (!res.ok) throw new Error('Failed to fetch logs');
+    return res.json(); // Mengembalikan { logs, nextDayToFill, canFillToday, filledDayToday }
+}
 
 
 

@@ -23,7 +23,8 @@ export default function ProfilePage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
     const qc = useQueryClient();
-    const initialChallenges = readCache(`overview-${profile?.id}`);
+    const userData = localStorage.getItem('userData');
+    const initialChallenges = readCache(`overview-${userData?.id}`);
 
     const {
         data: overview,
@@ -55,15 +56,7 @@ export default function ProfilePage() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                fetchProfileData();
-            } catch (error) {
-                setError(error.message);
-                console.error('Error:', error);
-            }
-        };
-            fetchData();
+        fetchProfileData();
     }, []);
 
     const handleSaveEmail = async () => {
