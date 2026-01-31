@@ -13,6 +13,22 @@ export async function fetchOverviewStats() {
 }
 
 // CHALLENGE HANDGLE TOGGLE PUBLIC
+export async function toggleChallengePublic(customId, isPublic) {
+    const res = await fetch(`/api/challenge/${customId}/toggle-public`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic }),
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || "Failed to update visibility");
+    }
+    
+    return data;
+}
 
 // CHALLENGES DETAIL
 export async function fetchChallengeDetail(customId) {
@@ -38,7 +54,24 @@ export async function fetchChallengeLogs(customId) {
     return res.json(); // Mengembalikan { logs, nextDayToFill, canFillToday, filledDayToday }
 }
 
-
+export async function updateChallengeLog(customId, day, { status, note }) {
+    const res = await fetch(`/api/challenge/${customId}/logs/${day}`, {
+        method: "PUT",
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status, note }),
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || "Failed to update log");
+    }
+    
+    return data;
+}
 
 // PROFILE
 

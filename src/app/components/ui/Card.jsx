@@ -4,7 +4,7 @@ import { MoreVertical} from "lucide-react";
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchChallengePublic } from "@/app/lib/api";
+import { fetchChallengePublic, toggleChallengePublic } from "@/app/lib/api";
 
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const { customId, title, description, progress, completedDays, onGoingDays, startDate, isPublic } = data;
@@ -55,26 +55,18 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
     }, [onDeleted]); 
 
     const toggleMutation = useMutation({
-        mutationFn: async ({ customId, newStatus }) => {
-            const response = await fetch(`/api/challenge/${customId}/toggle-public`, {
-                method: 'PUT',
-                body: JSON.stringify({ isPublic: newStatus }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!response.ok) throw new Error("Gagal update status");
-            return response.json();
-        },
+        mutationFn: ({ customId, newStatus }) => 
+            toggleChallengePublic(customId, newStatus),
         onSuccess: (resData, variables) => {
             // 1. Beritahu React Query bahwa data challenge list sudah "basi"
-            // Ganti 'challenges' sesuai dengan queryKey yang kamu pakai di halaman Dashboard
             queryClient.invalidateQueries({ queryKey: ['challenges'] });
 
             // 2. Jika diubah jadi Public, kita PREFETCH data publiknya
             if (variables.newStatus) {
                 console.log("Prefetching challenge public...");
                 queryClient.prefetchQuery({
-                    queryKey: ['challengePublic', customId],
-                    queryFn: () => fetchChallengePublic(customId),
+                    queryKey: ['challengePublic', variables.customId],
+                    queryFn: () => fetchChallengePublic(variables.customId),
                     staleTime: 1000 * 60 * 5,
                 });
             }

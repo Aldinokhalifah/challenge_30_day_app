@@ -4,7 +4,7 @@ import { Clock, XCircle, CheckCircle, Calendar, Sparkles, Save, FileText, Lock }
 import ReminderLog from "./ReminderLog";
 import Loading from "./loading";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchChallengeLogs } from "@/app/lib/api";
+import { fetchChallengeLogs, updateChallengeLog } from "@/app/lib/api";
 
 export default function LogCard() {
     const { customId } = useParams();
@@ -22,15 +22,8 @@ export default function LogCard() {
     const { logs = [], nextDayToFill, canFillToday, filledDayToday } = data || {};
 
     const updateLogMutation = useMutation({
-        mutationFn: async ({ day, status, note }) => {
-            const res = await fetch(`/api/challenge/${customId}/logs/${day}`, {
-                method: "PUT",
-                credentials: 'include',
-                body: JSON.stringify({ status, note }),
-            });
-            if (!res.ok) throw new Error("Failed to update log");
-            return res.json();
-        },
+        mutationFn: async ({ day, status, note }) =>
+            updateChallengeLog(customId, day, { status, note }),
         onSuccess: (resData, variables) => {
             // REFRESH DATA! Ini otomatis menggantikan reloadChallenges()
             queryClient.invalidateQueries({ queryKey: ['challenge-logs', customId] });
@@ -46,7 +39,10 @@ export default function LogCard() {
                 setTimeout(() => setShowConfirmation(null), 3000);
             }
         },
-        onError: (err) => alert(err.message)
+        onError: (err) => {
+            // Tampilkan error message dari backend
+            alert(err.message);
+        }
     });
 
     const handleEditLog = useCallback((log) => {
