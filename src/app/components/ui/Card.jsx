@@ -4,7 +4,7 @@ import { MoreVertical} from "lucide-react";
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchChallengePublic, toggleChallengePublic } from "@/app/lib/api";
+import { fetchChallengePublic, toggleChallengePublic, deleteChallenge } from "@/app/lib/api";
 
 export default function ChallengeCard({ data, onDeleted, onEdit }) {
     const { customId, title, description, progress, completedDays, onGoingDays, startDate, isPublic } = data;
@@ -28,31 +28,30 @@ export default function ChallengeCard({ data, onDeleted, onEdit }) {
 
     const getDayStarted = Math.ceil((new Date() - new Date(startDate)) / (1000 * 60 * 60 * 24));
 
-    const handleDelete = useCallback(async (customId) => {
-        const confirmation = window.confirm("Are you sure you want to delete this challenge?");
-
-        if(confirmation) {
-            try {
-                const response = await fetch(`/api/challenge/${customId}/delete`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error("Delete failed:", errorText);
-                    return;
-                }
-
-                const data = await response.json();
-                console.log("Challenge deleted:", data.message);
-                
-                if (onDeleted) onDeleted();
-            } catch (error) {
-                console.error(error.message);
-            }
+    const deleteMutation = useMutation({
+        mutationFn: (customId) => deleteChallenge(customId),
+        onSuccess: (data) => {
+            console.log("Challenge deleted:", data.message);
+            
+            // Invalidate queries untuk refresh data
+            queryClient.invalidateQueries({ queryKey: ['challenges'] });
+            queryClient.invalidateQueries({ queryKey: ['overviewStats'] });
+            
+            if (onDeleted) onDeleted();
+        },
+        onError: (error) => {
+            console.error("Delete failed:", error.message);
+            alert(error.message);
         }
-    }, [onDeleted]); 
+    });
+
+    const handleDelete = useCallback((customId) => {
+        const confirmation = window.confirm("Are you sure you want to delete this challenge?");
+        
+        if (confirmation) {
+            deleteMutation.mutate(customId);
+        }
+    }, [deleteMutation]);
 
     const toggleMutation = useMutation({
         mutationFn: ({ customId, newStatus }) => 

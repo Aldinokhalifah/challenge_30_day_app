@@ -1,3 +1,10 @@
+// AUTH LOGIN
+
+// AUTH REGISTER
+
+// AUTH LOGOUT
+
+
 // CHALLENGES
 export async function fetchChallenges() {
     const res = await fetch('/api/challenge/read', { credentials: 'include' });
@@ -12,7 +19,59 @@ export async function fetchOverviewStats() {
     return res.json();
 }
 
-// CHALLENGE HANDGLE TOGGLE PUBLIC
+// CREATE CHALLENGE
+export async function createChallenge({ title, description, startDate }) {
+    const res = await fetch('/api/challenge/create', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, startDate }),
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || "Failed to create challenge");
+    }
+    
+    return data;
+}
+
+// UPDATE CHALLENGE
+export async function updateChallenge(customId, { title, description, startDate }) {
+    const res = await fetch(`/api/challenge/${customId}/edit`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, startDate }),
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || "Failed to update challenge");
+    }
+    
+    return data;
+}
+
+// DELETE CHALLENGE
+export async function deleteChallenge(customId) {
+    const res = await fetch(`/api/challenge/${customId}/delete`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+    
+    const data = await res.json();
+    
+    if (!res.ok) {
+        throw new Error(data.message || "Failed to delete challenge");
+    }
+    
+    return data;
+}
+
+// CHALLENGE HANDLE TOGGLE PUBLIC
 export async function toggleChallengePublic(customId, isPublic) {
     const res = await fetch(`/api/challenge/${customId}/toggle-public`, {
         method: 'PUT',
@@ -54,6 +113,7 @@ export async function fetchChallengeLogs(customId) {
     return res.json(); // Mengembalikan { logs, nextDayToFill, canFillToday, filledDayToday }
 }
 
+// UPDATE LOG
 export async function updateChallengeLog(customId, day, { status, note }) {
     const res = await fetch(`/api/challenge/${customId}/logs/${day}`, {
         method: "PUT",
