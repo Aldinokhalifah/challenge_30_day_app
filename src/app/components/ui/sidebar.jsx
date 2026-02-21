@@ -18,7 +18,12 @@ export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const userData = localStorage.getItem('userData');
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+      const data = localStorage.getItem('userData');
+      setUserData(data ? JSON.parse(data) : null);
+  }, []);
 
   // Cek apakah user sudah login dari userData di localStorage
   useEffect(() => {
@@ -26,8 +31,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
     // Listen untuk perubahan localStorage (dari tab lain atau logout)
     const handleStorageChange = () => {
-      // const userData = localStorage.getItem('userData');
-      setIsLoggedIn(!!userData);
+        const data = localStorage.getItem('userData');
+        setIsLoggedIn(!!data);
+        setUserData(data ? JSON.parse(data) : null);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -52,7 +58,7 @@ export default function Sidebar({ isOpen, onClose }) {
       setIsLoggedIn(false);
       router.push('/Login');
     }
-  }, [router, queryClient, userData]);
+  }, [router, queryClient]);
 
   return (
     <>

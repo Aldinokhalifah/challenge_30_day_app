@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { User, Mail, Lock, Edit2, Trash2, Trophy, Eye, EyeOff, Save, X } from 'lucide-react';
 import Loading from '../ui/loading';
 import { useRouter } from 'next/navigation';
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { readCache } from '@/app/lib/localCache';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateProfileEmail } from '@/app/lib/api';
 import { fetchOverviewStats } from '@/app/lib/api';
 
 export default function ProfilePage() {
@@ -57,25 +57,12 @@ export default function ProfilePage() {
         fetchProfileData();
     }, []);
 
-    const handleSaveEmail = async () => {
-        try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            
-            if (!userData) throw new Error('No user data found');
-
-            const response = await fetch(`/api/profile/edit/${userData.id}`, {
-                method: 'PUT',
-                credentials: 'include',
-                body: JSON.stringify({ email: tempEmail })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update email');
-            }
-
-            const data = await response.json();
-
+    const updateEmailMutation = useMutation({
+        mutationFn: async (email) => 
+            updateProfileEmail(email),
+        onSuccess: () => {
             // Update local storage dengan data baru
+            const userData = JSON.parse(localStorage.getItem('userData'));
             const updatedUserData = {
                 ...userData,
                 email: tempEmail
@@ -88,15 +75,21 @@ export default function ProfilePage() {
                 email: tempEmail
             }));
             
+            // 🔧 Invalidate query cache agar overview tetap konsisten
+            qc.invalidateQueries({ queryKey: ['overviewStats'] });
+            
             setIsEditingEmail(false);
             setError(null);
-
-        } catch (error) {
-            console.error('Error updating email:', error);
-            setError(error.message);
-            // Kembalikan email ke nilai sebelumnya jika gagal
-            setTempEmail(profile.email);
+        },
+        onError: (err) => {
+            // Tampilkan error message dari backend
+            setError(err.message);
+            alert(err.message);
         }
+    });
+
+    const handleSaveEmail = async () => {
+        updateEmailMutation.mutate(tempEmail);
     };
 
     const handleSavePassword = async () => {
@@ -115,10 +108,15 @@ export default function ProfilePage() {
             const response = await fetch(`/api/profile/edit/${userData.id}`, {
                 method: 'PUT',
                 credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({password: tempPassword})
             });
 
-            const data = response.json();
+            if (!response.ok) {
+                throw new Error('Failed to update password');
+            }
+
+            const data = await response.json();
 
             setProfile(prev => ({
                 ...profile,
@@ -200,16 +198,16 @@ export default function ProfilePage() {
                                         <div>
                                             <p className="text-indigo-200 text-sm font-medium">Total Challenges</p>
                                             <p className="text-4xl font-extrabold text-white">
-                                                {overview.totalChallenges || 0}
+                                                {overview?.totalChallenges || 0}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {overviewError || error && (
+                            {(overviewError || error) && (
                                 <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl text-sm">
-                                    {overviewError || error}
+                                    {overviewError?.message || error}
                                 </div>
                             )}
 

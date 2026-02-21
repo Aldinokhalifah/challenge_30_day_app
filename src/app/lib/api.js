@@ -134,6 +134,26 @@ export async function updateChallengeLog(customId, day, { status, note }) {
 }
 
 // PROFILE
+export async function updateProfileEmail(email) {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData) throw new Error("No user data found");
+
+    const response = await fetch(`/api/profile/edit/${userData.id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update email");
+    }
+
+    const data = await response.json();
+
+    return data;
+}
 
 // CHALLENGE PUBLIC
 export async function fetchChallengePublic(customId) {

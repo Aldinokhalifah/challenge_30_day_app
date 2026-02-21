@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const challengeSchema = new mongoose.Schema({
-    userId: mongoose.Schema.Types.ObjectId,
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     customId: {
         type: Number,
         required: true,
