@@ -38,6 +38,13 @@ export async function POST(req) {
             );
         }
 
+        if(password.length < 8) {
+            return NextResponse.json(
+                { message: 'Password Minimum is 8 Characters' },
+                { status: 400 }
+            );
+        }
+
         const newUser = new User({
             customId,
             name,

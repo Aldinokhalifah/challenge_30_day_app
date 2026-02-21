@@ -10,12 +10,10 @@ import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 import Hero from "@/app/components/Home/Hero";
 import OverviewStats from "@/app/components/Home/OverviewStats";
 import Loading from "@/app/components/ui/loading";
-import { useRouter } from 'next/navigation';
 
 function HomePage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userData, setUserData] = useState(null);
-    const router = useRouter();
     const qc = useQueryClient();
 
     // Track user activity untuk inaktivitas check

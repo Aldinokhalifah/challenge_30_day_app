@@ -9,7 +9,6 @@ import { ActiveChallengesSection } from "@/app/components/Challenges/ActiveChall
 import Loading from "@/app/components/ui/loading";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchChallenges } from "@/app/lib/api";
-import { readCache } from "@/app/lib/localCache";
 
 function Challenges() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

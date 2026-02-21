@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback } from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
@@ -8,7 +8,6 @@ import Sidebar from "@/app/components/ui/sidebar";
 import { ArrowRightToLine, Menu } from "lucide-react";
 import LogCard from "@/app/components/ui/Log";
 import Link from "next/link";
-
 
 function Logs() {
     const { customId } = useParams();

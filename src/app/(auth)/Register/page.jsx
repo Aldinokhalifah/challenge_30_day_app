@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import AnimatedGradientBg from "@/app/components/ui/animatedBgGradient";
 
-
 export default function Register() {
     const [form, setForm] = useState({ name: '', email: '', password: '' });
     const router = useRouter();
@@ -40,10 +39,10 @@ export default function Register() {
         }
 
         // Validasi password length
-        if (form.password.length < 6) {
+        if (form.password.length < 8) {
             Swal.fire({
                 title: "Error",
-                text: "Password minimun require is 6 characters",
+                text: "Password minimun require is 8 characters",
                 icon: "error"
             });
             return;
@@ -140,6 +139,9 @@ export default function Register() {
                                     required
                                     onChange={handleChange}
                                     />
+                                    {form.password.length < 8 && form.password.length > 0 && (
+                                        <p className="text-orange-400 text-sm">Password must be at least 8 characters</p>
+                                    )}
                                 </div>
                                 <div className="mt-5">
                                     <button

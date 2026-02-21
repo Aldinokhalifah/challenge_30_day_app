@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Calendar, Target, Flame, CheckCircle, Clock, Award } from "lucide-react";
+import { Target, Flame, CheckCircle, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import PublicBadge from "../../ui/challenge_public/hero/publicBadge";
 import ShareButton from "../../ui/challenge_public/hero/shareButton";

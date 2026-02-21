@@ -3,7 +3,7 @@ import { User, Mail, Lock, Edit2, Trash2, Trophy, Eye, EyeOff, Save, X } from 'l
 import Loading from '../ui/loading';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateProfileEmail } from '@/app/lib/api';
+import { deleteProfileAccount, updateProfileEmail, updateProfilePassword } from '@/app/lib/api';
 import { fetchOverviewStats } from '@/app/lib/api';
 
 export default function ProfilePage() {
@@ -75,8 +75,8 @@ export default function ProfilePage() {
                 email: tempEmail
             }));
             
-            // 🔧 Invalidate query cache agar overview tetap konsisten
-            qc.invalidateQueries({ queryKey: ['overviewStats'] });
+            // Invalidate query cache agar overview tetap konsisten
+            // qc.invalidateQueries({ queryKey: ['overviewStats'] });
             
             setIsEditingEmail(false);
             setError(null);
@@ -92,32 +92,11 @@ export default function ProfilePage() {
         updateEmailMutation.mutate(tempEmail);
     };
 
-    const handleSavePassword = async () => {
-        try {
-            if (tempPassword === confirmPassword && tempPassword.length >= 8) {
-                setProfile({ ...profile, password: '' });
-                setIsEditingPassword(false);
-                setTempPassword('');
-                setConfirmPassword('');
-            }
-
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            
-            if (!userData) throw new Error('No user data found');
-
-            const response = await fetch(`/api/profile/edit/${userData.id}`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({password: tempPassword})
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update password');
-            }
-
-            const data = await response.json();
-
+    const updatePasswordMutation = useMutation({
+        mutationFn: async (password) => 
+            updateProfilePassword(password),
+        onSuccess: () => {
+            // Update state setelah konfirmasi dari server
             setProfile(prev => ({
                 ...profile,
                 password: tempPassword
@@ -125,39 +104,43 @@ export default function ProfilePage() {
 
             setIsEditingPassword(false);
             setError(null);
-        } catch (error) {
-            console.error('Error updating email:', error);
-            setError(error.message);
+        },
+        onError: (err) => {
+            // Tampilkan error message dari backend
+            setError(err.message);
 
+            // assign password lama dari user jika gagal
             setTempPassword(profile.password);
+            alert(err.message);
         }
+    })
+
+    const handleSavePassword = async () => {
+        if (tempPassword === confirmPassword && tempPassword.length >= 8) {
+            setProfile({ ...profile, password: "" });
+            setIsEditingPassword(false);
+            setTempPassword("");
+            setConfirmPassword("");
+        }
+
+        updatePasswordMutation.mutate(tempPassword);
     };
 
-    const handleDeleteAccount = async () => {
-        try {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            
-            if (!userData) throw new Error('No user data found');
-
-            const response = await fetch(`/api/profile/delete/${userData.id}`, {
-                method: 'DELETE',
-                credentials: 'include',
-                body: JSON.stringify({password: tempPassword})
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText);
-            }
-            localStorage.removeItem('userData');
-
-            const data = await response.json();
+    const DeleteAccountMutation = useMutation({
+        mutationFn: async () => 
+            deleteProfileAccount(),
+        onSuccess: () => {
             console.log("User deleted:", data.message);
-
             router.push('/Login');
-        } catch (error) {
-            console.error(error);
+        },
+        onError: (err) => {
+            console.log(err.message);
         }
+        
+    })
+
+    const handleDeleteAccount = async () => {
+        DeleteAccountMutation.mutate();
     };
 
     return (
@@ -244,9 +227,19 @@ export default function ProfilePage() {
                                             <button
                                                 onClick={handleSaveEmail}
                                                 className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                                                disabled={EmailMutation.isPending || profile.email == tempEmail}
                                             >
-                                                <Save className="w-5 h-5" />
-                                                Save
+                                                {!updateEmailMutation.isPending ? (
+                                                    <>
+                                                        <Save className="w-5 h-5" />
+                                                        <span>Save</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span>Saving...</span>
+                                                    </>
+                                                )}
                                             </button>
                                             <button
                                                 onClick={() => setIsEditingEmail(false)}
@@ -313,11 +306,21 @@ export default function ProfilePage() {
                                         <div className="flex gap-3">
                                             <button
                                                 onClick={handleSavePassword}
-                                                disabled={!tempPassword || tempPassword !== confirmPassword || tempPassword.length < 8}
+                                                disabled={!tempPassword || tempPassword !== confirmPassword || tempPassword.length < 8 || updatePasswordMutation.isPending}
                                                 className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                                             >
-                                                <Save className="w-5 h-5" />
-                                                Update Password
+                                                {!updatePasswordMutation.isPending ? (
+                                                    <>
+                                                        <Save className="w-5 h-5" />
+                                                        Update Password
+                                                    </> 
+                                                    ):(
+                                                    <>
+                                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span>Saving...</span>
+                                                    </>
+                                                    )
+                                                }
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -373,8 +376,21 @@ export default function ProfilePage() {
                                 <button
                                     onClick={handleDeleteAccount}
                                     className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 hover:scale-105 transition-all duration-300 shadow-lg"
+                                    disabled={DeleteAccountMutation.isPending}
                                 >
-                                    Yes, Delete Account
+                                    {!DeleteAccountMutation.isPending ? (
+                                        <>
+                                            Yes, Delete Account
+                                        </>
+                                        ) : 
+                                        (
+                                            <>
+                                                <div className='flex'>
+                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                    <span className='ml-2'>Deleting...</span>
+                                                </div>
+                                            </>
+                                        )}
                                 </button>
                             </div>
                         </div>

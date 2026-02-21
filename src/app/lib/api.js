@@ -133,7 +133,7 @@ export async function updateChallengeLog(customId, day, { status, note }) {
     return data;
 }
 
-// PROFILE
+// UPDATE PROFILE EMAIL
 export async function updateProfileEmail(email) {
     const userData = JSON.parse(localStorage.getItem("userData"));
 
@@ -153,6 +153,46 @@ export async function updateProfileEmail(email) {
     const data = await response.json();
 
     return data;
+}
+
+// UPDATE PROFILE PASSWORD
+export async function updateProfilePassword(password) {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData) throw new Error("No user data found");
+
+    const response = await fetch(`/api/profile/edit/${userData.id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update password");
+    }
+
+    const data = await response.json();
+
+    return data;
+}
+
+// DELETE PROFILE ACCOUNT
+export async function deleteProfileAccount() {
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData) throw new Error("No user data found");
+
+    const response = await fetch(`/api/profile/delete/${userData.id}`, {
+        method: "DELETE",
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+    }
+    localStorage.removeItem("userData");
 }
 
 // CHALLENGE PUBLIC
