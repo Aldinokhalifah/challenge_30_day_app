@@ -16,10 +16,13 @@ const challengeSchema = new mongoose.Schema({
     lastFilled: {
         day: { type: Number, default: null },
         dateISO: { type: String, default: null } 
-    }
+    },
+    viewsCount: { type: Number, default: 0 },
+    likesCount: { type: Number, default: 0 },
+    commentsCount: { type: Number, default: 0 }
 });
 
 // Tambahkan compound index untuk query optimization
-challengeSchema.index({ userId: 1, customId: 1 });
+challengeSchema.index({ userId: 1, customId: 1 }, {unique: true});
 
 export default mongoose.models.Challenge || mongoose.model('Challenge', challengeSchema);
